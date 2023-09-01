@@ -28,7 +28,7 @@
         android:layout_marginTop="40dp"
         android:layout_marginEnd="16dp"
         android:hint="Sujet de la réunion"
-        android:hintTextColor="@color/placeholder_color"
+
         android:inputType="text"
         android:maxLines="1"
         app:layout_constraintEnd_toEndOf="parent"
@@ -95,3 +95,10 @@
         app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+<!--time picker dialog
+date picker dialog
+Lieu de réunion = menu déroulant 10 fake (spinner)
+required ts les champs remplis
+live data pr chaque champs
+vérifier ds viewmodel que ts les live data sont pas vides avant d'ajouter réunion sinon message d'erreur-->
