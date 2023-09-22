@@ -2,6 +2,7 @@ package com.example.mareu.data;
 
 import android.util.Log;
 
+import java.util.Calendar;
 import java.util.List;
 
 public class DummyMeetingApiService implements MeetingApiService {
@@ -34,5 +35,4 @@ public class DummyMeetingApiService implements MeetingApiService {
         public List<Meeting> getFilteredMeetingsByDate() {
             return null;
         }
-
 }

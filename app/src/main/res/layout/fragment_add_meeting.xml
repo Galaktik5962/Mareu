@@ -1,104 +1,149 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- TextView pour le titre de l'écran d'ajout de réunion -->
-    <TextView
-        android:id="@+id/titre_ecran_ajout_reunion"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Ajouter une réunion"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:layout_marginTop="16dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <!-- EditText pour le sujet de la réunion -->
     <EditText
         android:id="@+id/sujet_de_la_reunion"
-        android:layout_width="360dp"
-        android:layout_height="50dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="40dp"
-        android:layout_marginEnd="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="56dp"
         android:hint="Sujet de la réunion"
-
         android:inputType="text"
-        android:maxLines="1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Spinner
+        android:id="@+id/lieu_de_la_reunion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:hint="Lieu de la réunion"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/titre_ecran_ajout_reunion" />
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
 
-    <!-- EditText pour le lieu de la réunion -->
-    <EditText
-        android:id="@+id/lieu_de_la_reunion"
-        android:layout_width="360dp"
-        android:layout_height="50dp"
-        android:layout_marginStart="16dp"
+    <TextView
+        android:id="@+id/date_de_la_reunion"
+        android:layout_width="320dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
-        android:layout_marginEnd="16dp"
-        android:hint="Lieu de la réunion"
-        android:inputType="text"
-        android:maxLines="1"
+        android:hint="Date de la réunion"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.109"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/sujet_de_la_reunion" />
 
-    <!-- EditText pour l'heure de la réunion -->
-    <EditText
+    <TextView
         android:id="@+id/heure_de_la_reunion"
-        android:layout_width="360dp"
-        android:layout_height="50dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="40dp"
-        android:layout_marginEnd="16dp"
+        android:layout_width="320dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="48dp"
         android:hint="Heure de la réunion"
-        android:inputType="text"
-        android:maxLines="1"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.109"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/date_de_la_reunion" />
+
+    <EditText
+        android:id="@+id/liste_des_participants"
+        android:layout_width="320dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="80dp"
+        android:hint="Liste des participants (adresses mail)"
+        android:inputType="textMultiLine"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.109"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/lieu_de_la_reunion" />
 
-    <!-- EditText pour la liste des participants -->
-    <EditText
-        android:id="@+id/liste_des_participants"
-        android:layout_width="360dp"
-        android:layout_height="50dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="40dp"
-        android:layout_marginEnd="16dp"
-        android:hint="Liste des participants (adresses mail)"
-        android:inputType="text"
-        android:maxLines="5"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/heure_de_la_reunion" />
-
-    <!-- Bouton pour valider l'ajout de la réunion -->
     <Button
         android:id="@+id/button_add_meeting"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="60dp"
         android:text="Ajouter la réunion"
         android:textSize="20sp"
-        android:padding="20dp"
         android:textStyle="bold"
-        android:layout_marginTop="40dp"
-        app:layout_constraintTop_toBottomOf="@+id/liste_des_participants"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/liste_des_participants" />
+
+    <Button
+        android:id="@+id/button_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="36dp"
+        android:text="Annuler"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button_add_meeting" />
+
+    <ImageButton
+        android:id="@+id/button_calendar"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="28dp"
+        android:clickable="true"
+        android:contentDescription="sélectionnez la date de la réunion"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.272"
+        app:layout_constraintStart_toEndOf="@+id/date_de_la_reunion"
+        app:layout_constraintTop_toBottomOf="@+id/sujet_de_la_reunion"
+        app:srcCompat="@drawable/ic_calendar" />
+
+    <ImageButton
+        android:id="@+id/button_time"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="32dp"
+        android:clickable="true"
+        android:contentDescription="sélectionnez l'heure de la réunion"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.279"
+        app:layout_constraintStart_toEndOf="@+id/heure_de_la_reunion"
+        app:layout_constraintTop_toBottomOf="@+id/date_de_la_reunion"
+        app:srcCompat="@drawable/ic_time" />
+
+    <ImageButton
+        android:id="@+id/button_add_mail"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="64dp"
+        android:clickable="true"
+        android:contentDescription="ajoutez une adresse mail"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.272"
+        app:layout_constraintStart_toEndOf="@+id/liste_des_participants"
+        app:layout_constraintTop_toBottomOf="@+id/lieu_de_la_reunion"
+        app:srcCompat="@drawable/baseline_add_24" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_marginTop="32dp"
+        android:text="Sélectionnez votre salle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/heure_de_la_reunion" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 
-<!--time picker dialog
-date picker dialog
-Lieu de réunion = menu déroulant 10 fake (spinner)
-required ts les champs remplis
-live data pr chaque champs
-vérifier ds viewmodel que ts les live data sont pas vides avant d'ajouter réunion sinon message d'erreur-->
+<!--regex mail, un seul text view avec un bouton + qui ajoutera les adresses mails sur une seule ligne avec les virgules etc...
+vérifier date et heure valide
+ne pas pouvoir sélectionner une salle si elle est déjà prise à cette heure
+mettre un text view et un bouton calendar à côté de la date pour l'accessibilité et pareil pour la date
+ un text view avec sélectionnez votre salle et le spinner en dessous
+ gérer mon bouton annuler
+ créer un menu sur mon bouton filtre avec des item et subitem voir you tube-->

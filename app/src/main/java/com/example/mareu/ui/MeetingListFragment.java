@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.mareu.DI.DI;
 import com.example.mareu.DI.MeetingViewModelFactory;
+import com.example.mareu.MainActivity;
 import com.example.mareu.R;
 import com.example.mareu.data.Meeting;
 import com.example.mareu.databinding.FragmentMeetingListBinding;
@@ -26,6 +27,8 @@ public class MeetingListFragment extends Fragment implements MeetingItemListener
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        ((MainActivity) requireActivity()).toolbarAndAddButtonAction(this);
 
         // Inflate le layout associé au fragment et le relie à la vue parente (container)
         return inflater.inflate(R.layout.fragment_meeting_list, container, false);

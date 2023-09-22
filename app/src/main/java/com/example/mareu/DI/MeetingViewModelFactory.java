@@ -1,5 +1,7 @@
 package com.example.mareu.DI;
 
+import android.content.Context;
+
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -12,9 +14,11 @@ public class MeetingViewModelFactory implements ViewModelProvider.Factory {
 
     private final MeetingRepository meetingRepository;
 
+
     // Constructeur de la fabrication des ViewModels
     public MeetingViewModelFactory(MeetingRepository meetingRepository) {
         this.meetingRepository = meetingRepository;
+
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.example.mareu.data;
 
+import java.util.Calendar;
 import java.util.List;
 
 public interface MeetingApiService {
@@ -13,7 +14,6 @@ public interface MeetingApiService {
     List<Meeting> getFilteredMeetingsByLocation();
 
     List<Meeting> getFilteredMeetingsByDate();
-
 }
 
 
