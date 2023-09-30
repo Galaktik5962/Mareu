@@ -65,15 +65,15 @@ public class MainActivity extends AppCompatActivity {
 
         if (fragment instanceof AddMeetingFragment) {
 
-            // Vous êtes sur le fragment d'ajout de réunion, masquez la toolbar et le bouton "Add"
-            getSupportActionBar().hide(); // Masquer la toolbar
-            binding.addButton.setVisibility(View.GONE); // Masquer le bouton "Add"
+            // L'utilisateur est sur le fragment d'ajout de réunion, la toolbar et le bouton "Add" sont masqués
+            getSupportActionBar().hide();
+            binding.addButton.setVisibility(View.GONE);
 
         } else {
 
-            // Vous êtes sur un autre fragment, restaurez la toolbar et le bouton "Add"
-            getSupportActionBar().show(); // Afficher la toolbar
-            binding.addButton.setVisibility(View.VISIBLE); // Afficher le bouton "Add"
+            // L'utilisateur est sur le fragment de la liste des réunions, la toolbar et le bouton "Add" sont affichés
+            getSupportActionBar().show();
+            binding.addButton.setVisibility(View.VISIBLE);
         }
     }
 }

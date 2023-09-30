@@ -1,10 +1,6 @@
 package com.example.mareu.ui;
 
-import android.content.Context;
-import android.os.Handler;
 import android.text.TextUtils;
-import android.util.Log;
-import android.widget.Toast;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -18,18 +14,22 @@ import java.util.Date;
 
 public class AddMeetingViewModel extends ViewModel {
 
+
     private MeetingRepository meetingRepository;
 
-    private MutableLiveData<String> subjectOfMeeting = new MutableLiveData<>();
+    private boolean isSubjectValid = false;
 
-    private MutableLiveData<Calendar> selectedDate = new MutableLiveData<>();
+    private String selectedSubject;
+    private MutableLiveData<Boolean> isDateValidLiveData = new MutableLiveData<>();
+    private Calendar selectedDate = Calendar.getInstance();
+    private MutableLiveData<Boolean> isTimeValidLiveData = new MutableLiveData<>();
+    private Calendar selectedTime = Calendar.getInstance();
 
-    private MutableLiveData<Calendar> selectedTime = new MutableLiveData<>();
+    private boolean isRoomValid = false;
 
-    private MutableLiveData<String> selectedRoom = new MutableLiveData<>();
-
-    private MutableLiveData<String> participantList = new MutableLiveData<>();
-
+    private String selectedRoom;
+    private MutableLiveData<Boolean> areParticipantsValidLiveData = new MutableLiveData<>();
+    private MutableLiveData<Boolean> isFormValidLiveData = new MutableLiveData<>();
     private MutableLiveData<Boolean> meetingAddedSuccessfully = new MutableLiveData<>();
 
 
@@ -37,84 +37,163 @@ public class AddMeetingViewModel extends ViewModel {
         this.meetingRepository = meetingRepository;
     }
 
-    public LiveData<String> getSubjectOfMeeting() {
-        return subjectOfMeeting;
+    public String getSelectedSubject() {
+        return selectedSubject;
     }
 
-    public void setSubjectOfMeeting(String subject) {
-        subjectOfMeeting.setValue(subject);
+    public void setSelectedSubject(String newSubject) {
+        selectedSubject = newSubject;
     }
 
-    public LiveData<Calendar> getSelectedDate() {
-        return selectedDate;
-    }
-
-    public void setSelectedDate(Calendar calendar) {
-        selectedDate.setValue(calendar);
-    }
-
-    public LiveData<Calendar> getSelectedTime() {
-        return selectedTime;
-    }
-
-    public void setSelectedTime(Calendar calendar) {
-        selectedTime.setValue(calendar);
-    }
-
-    public LiveData<String> getSelectedRoom() {
+    public String getSelectedRoom() {
         return selectedRoom;
     }
 
-    public void setSelectedRoom(String room) {
-        selectedRoom.setValue(room);
+    public void setSelectedRoom(String newRoom) {
+        selectedRoom = newRoom;
     }
 
-    public LiveData<String> getParticipantList() {
-        return participantList;
+    public LiveData<Boolean> getIsDateValidLiveData() {
+        return isDateValidLiveData;
     }
 
-    public void setParticipantList(String participants) {
-        participantList.setValue(participants);
+    public Calendar getSelectedDate() {
+        return selectedDate;
+    }
+    public void setSelectedDate(Calendar newDate) {
+        selectedDate = newDate;
+    }
+
+    public LiveData<Boolean> getIsTimeValidLiveData() {
+        return isTimeValidLiveData;
+    }
+
+    public Calendar getSelectedTime() {
+        return selectedTime;
+    }
+
+    public void setSelectedTime(Calendar newTime) {
+        selectedTime = newTime;
+    }
+
+
+
+    public LiveData<Boolean> areParticipantsValidLiveData() {
+        return areParticipantsValidLiveData;
+    }
+
+    public LiveData<Boolean> getIsFormValidLiveData() {
+        return isFormValidLiveData;
     }
 
     public LiveData<Boolean> getMeetingAddedSuccessfully() {
         return meetingAddedSuccessfully;
     }
 
+    public void validateSubject(String subject) {
+       isSubjectValid = !TextUtils.isEmpty(subject);
+
+       setSelectedSubject(subject); // fournir la valeur pour tous les champs
+
+        // Vérifie si tous les champs sont valides et met à jour l'état global du formulaire
+        updateFormValidationState();
+    }
+
+
+
+    public void validateDate(Calendar selectedDate) {
+        // Obtention de la date actuelle
+        Calendar currentDate = Calendar.getInstance(); // heure et minute à minuit pile
+
+        // Vérifie si la date sélectionnée est après ou égale à la date actuelle en ignorant l'heure
+        boolean isValid = selectedDate != null && selectedDate.after(currentDate) || selectedDate.equals(currentDate);
+
+        isDateValidLiveData.setValue(isValid);
+
+        if (isValid) {
+            // Si la date est valide, mise à jour de la date sélectionnée
+            setSelectedDate(selectedDate);
+        }
+
+        // Vérifie si tous les champs sont valides et met à jour l'état global du formulaire
+        updateFormValidationState();
+    }
+
+    public void validateTime(Calendar selectedTime) { // si date de demain et heure antérieure à celle d'aujourd'hui ça doit fonctionné, vérif doit se faire uniquement à la date d'aujourd'hui
+        boolean isValid = selectedTime != null && selectedTime.after(Calendar.getInstance());
+        isTimeValidLiveData.setValue(isValid);
+
+        if (isValid) {
+            // Si l'heure est valide, mise à jour de l'heure sélectionnée
+            setSelectedTime(selectedTime);
+        }
+
+        // Vérifie si tous les champs sont valides et met à jour l'état global du formulaire
+        updateFormValidationState();
+    }
+
+    public void validateRoom(String selectedRoom) {
+        isRoomValid = !TextUtils.isEmpty(selectedRoom);
+
+        setSelectedRoom(selectedRoom); // fournir la valeur pour tous les champs
+
+        // Vérifie si tous les champs sont valides et met à jour l'état global du formulaire
+        updateFormValidationState();
+    }
+
+    public void validateParticipants(String emails) {
+        boolean isValid = areEmailsValid(emails);
+        areParticipantsValidLiveData.setValue(isValid);
+
+        if (isValid) {
+            // Si les participants sont valides, mise à jour de la liste des participants
+            setSelectedRoom(emails);
+        }
+
+        // Vérifie si tous les champs sont valides et met à jour l'état global du formulaire
+        updateFormValidationState();
+    }
+
+    boolean areEmailsValid(String emails) {
+
+        String regex = "[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}";
+        return emails.matches(regex);
+    }
+
+    private void updateFormValidationState() {
+
+        boolean  isSubjectValid = !TextUtils.isEmpty(selectedSubject);
+        boolean isDateValid = isDateValidLiveData.getValue() != null && isDateValidLiveData.getValue();
+        boolean isTimeValid = isTimeValidLiveData.getValue() != null && isTimeValidLiveData.getValue();
+        boolean isRoomValid = !TextUtils.isEmpty(selectedRoom);
+        boolean areParticipantsValid = areParticipantsValidLiveData.getValue() != null && areParticipantsValidLiveData.getValue();
+
+        // Mise à jour de l'état global du formulaire en fonction de la validité de tous les champs
+        boolean isFormValid = isSubjectValid && isRoomValid && isDateValid && isTimeValid && areParticipantsValid;
+        isFormValidLiveData.setValue(isFormValid);
+    }
+
     public void addMeetingToMeetingList(String subjectOfMeeting, String selectedRoom, Calendar selectedDate, Calendar selectedTime, String participantList) {
 
-        // Vérifiez que tous les champs sont remplis
-        if (isInputValid()) {
+        // Vérifie que tous les champs sont remplis et valides
+        // enlever la ligne si le bouton s'active ou pas
 
-            // Convertissez la date et l'heure en un objet Date
+            // Conversiion de la date et l'heure en un objet Date
             Date meetingDateAndTime = createMeetingDate(selectedDate, selectedTime);
 
-            // Créez une instance de la réunion avec les détails fournis
+            // Création d'une une instance de la réunion avec les détails fournis
             Meeting newMeeting = new Meeting(subjectOfMeeting, selectedRoom, meetingDateAndTime, participantList);
 
-            // Appelez la méthode pour ajouter la réunion à la liste
+            // Appel à la méthode pour ajouter la réunion à la liste
             addMeetingToMeetingListViaRepository(newMeeting);
 
-            // Dans la méthode d'ajout de la réunion réussie
+            // La réunion s'ajoute avec succès
             meetingAddedSuccessfully.setValue(true);
-
-        } else {
-            // Dans la méthode de réinitialisation des champs
-            meetingAddedSuccessfully.setValue(false);
         }
-    }
-
-    private boolean isInputValid() {
-        return !TextUtils.isEmpty(subjectOfMeeting.getValue())
-                && !TextUtils.isEmpty(selectedRoom.getValue())
-                && selectedDate.getValue() != null
-                && selectedTime.getValue() != null
-                && !TextUtils.isEmpty(participantList.getValue());
-    }
 
     private Date createMeetingDate(Calendar selectedDate, Calendar selectedTime) {
 
-        // Combinez la date et l'heure pour créer une instance de Date
+        // Combinaison de la date et l'heure pour créer une instance de Date
         Calendar meetingDateAndTime = Calendar.getInstance();
         meetingDateAndTime.set(
                 selectedDate.get(Calendar.YEAR),
@@ -127,7 +206,9 @@ public class AddMeetingViewModel extends ViewModel {
     }
 
     private void addMeetingToMeetingListViaRepository(Meeting newMeeting) {
-        // Ajoutez ici la logique pour ajouter la réunion à la liste (par exemple, via le Repository)
+        // Ajout de la réunion à la liste via le repository
         meetingRepository.createMeeting(newMeeting);
     }
+
+
 }

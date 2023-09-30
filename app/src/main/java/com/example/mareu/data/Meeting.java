@@ -10,7 +10,7 @@ public class Meeting {
     private String subjectOfMeeting;
     private String meetingLocation;
     private Date meetingDateAndTime;
-    private String meetingParticipants;
+    private String meetingParticipants; // list string
 
     public Meeting (String subjectOfMeeting, String meetingLocation, Date meetingDateAndTime, String meetingParticipants) {
         this.subjectOfMeeting = subjectOfMeeting;
