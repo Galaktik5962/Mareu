@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/filter_icon"
+        android:icon="@drawable/baseline_filter_alt_24"
+        android:title="filter_menu"
+        android:width="50dp"
+        android:height="50dp"
+        app:showAsAction="ifRoom"/>
+
+</menu>

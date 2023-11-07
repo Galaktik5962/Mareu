@@ -1,14 +1,11 @@
 package com.example.mareu.DI;
 
-import android.content.Context;
-
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.mareu.data.DummyMeetingGenerator;
 import com.example.mareu.data.MeetingRepository;
 import com.example.mareu.ui.AddMeetingViewModel;
-import com.example.mareu.ui.MeetingListViewModel;
+import com.example.mareu.ui.MeetingSharedViewModel;
 
 public class MeetingViewModelFactory implements ViewModelProvider.Factory {
 
@@ -16,8 +13,8 @@ public class MeetingViewModelFactory implements ViewModelProvider.Factory {
 
 
     // Constructeur de la fabrication des ViewModels
-    public MeetingViewModelFactory(MeetingRepository meetingRepository) {
-        this.meetingRepository = meetingRepository;
+    public MeetingViewModelFactory() {
+        this.meetingRepository = DI.checkIfRepositoryExists(); // Si le repository existe ne pas le créer, sinon le créer
 
     }
 
@@ -25,16 +22,16 @@ public class MeetingViewModelFactory implements ViewModelProvider.Factory {
     public <T extends ViewModel> T create(Class<T> modelClass) {
 
         // Vérifie si le ViewModel demandé est de type MeetingListViewModel
-        if (modelClass.isAssignableFrom(MeetingListViewModel.class)) {
 
-            // Crée et retourne une instance de MeetingListViewModel en lui fournissant le MeetingRepository
-            return (T) new MeetingListViewModel(meetingRepository);
-
-        } else if (modelClass.isAssignableFrom(AddMeetingViewModel.class)) {
+        if (modelClass.isAssignableFrom(AddMeetingViewModel.class)) {
             return (T) new AddMeetingViewModel(meetingRepository);
+
+        } else if (modelClass.isAssignableFrom(MeetingSharedViewModel.class)) {
+            return (T) new MeetingSharedViewModel(meetingRepository);
+
         }
 
-        // Si le ViewModel demandé n'est ni MeetingListViewModel ni AddMeetingViewModel, lance une exception
+        // Si le ViewModel demandé n'est ni MeetingListViewModel ni AddMeetingViewModel ni MeetingSharedViewModel, lance une exception
         throw new IllegalArgumentException("Unknown ViewModel class");
     }
 }

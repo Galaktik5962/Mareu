@@ -3,6 +3,7 @@ package com.example.mareu.data;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class Meeting {
@@ -10,9 +11,9 @@ public class Meeting {
     private String subjectOfMeeting;
     private String meetingLocation;
     private Date meetingDateAndTime;
-    private String meetingParticipants; // list string
+    private List<String> meetingParticipants; // list string
 
-    public Meeting (String subjectOfMeeting, String meetingLocation, Date meetingDateAndTime, String meetingParticipants) {
+    public Meeting (String subjectOfMeeting, String meetingLocation, Date meetingDateAndTime, List<String> meetingParticipants) {
         this.subjectOfMeeting = subjectOfMeeting;
         this.meetingLocation = meetingLocation;
         this.meetingDateAndTime = meetingDateAndTime;
@@ -48,11 +49,11 @@ public class Meeting {
         return timeFormat.format(meetingDateAndTime);
     }
 
-    public String getMeetingParticipants() {
+    public List<String> getMeetingParticipants() {
         return meetingParticipants;
     }
 
-    public void setMeetingParticipants(String meetingParticipants) {
+    public void setMeetingParticipants(List<String> meetingParticipants) {
         this.meetingParticipants = meetingParticipants;
     }
 }

@@ -9,13 +9,16 @@ import androidx.lifecycle.ViewModel;
 import com.example.mareu.data.Meeting;
 import com.example.mareu.data.MeetingRepository;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class AddMeetingViewModel extends ViewModel {
 
 
     private MeetingRepository meetingRepository;
+
 
     private boolean isSubjectValid = false;
 
@@ -29,6 +32,16 @@ public class AddMeetingViewModel extends ViewModel {
 
     private String selectedRoom;
     private MutableLiveData<Boolean> areParticipantsValidLiveData = new MutableLiveData<>();
+
+    private MutableLiveData<List<String>> participantListLiveData = new MutableLiveData<>();
+
+    private List<String> participantList = new ArrayList<>();
+
+
+    public LiveData<List<String>> getParticipantListLiveData() {
+        return participantListLiveData;
+    }
+
     private MutableLiveData<Boolean> isFormValidLiveData = new MutableLiveData<>();
     private MutableLiveData<Boolean> meetingAddedSuccessfully = new MutableLiveData<>();
 
@@ -60,6 +73,7 @@ public class AddMeetingViewModel extends ViewModel {
     public Calendar getSelectedDate() {
         return selectedDate;
     }
+
     public void setSelectedDate(Calendar newDate) {
         selectedDate = newDate;
     }
@@ -76,10 +90,12 @@ public class AddMeetingViewModel extends ViewModel {
         selectedTime = newTime;
     }
 
-
-
     public LiveData<Boolean> areParticipantsValidLiveData() {
         return areParticipantsValidLiveData;
+    }
+
+    public List<String> getParticipantList() {
+        return participantList;
     }
 
     public LiveData<Boolean> getIsFormValidLiveData() {
@@ -90,20 +106,25 @@ public class AddMeetingViewModel extends ViewModel {
         return meetingAddedSuccessfully;
     }
 
+
     public void validateSubject(String subject) {
-       isSubjectValid = !TextUtils.isEmpty(subject);
+        isSubjectValid = !TextUtils.isEmpty(subject);
 
-       setSelectedSubject(subject); // fournir la valeur pour tous les champs
+        setSelectedSubject(subject); // fournir la valeur pour tous les champs
 
-        // Vérifie si tous les champs sont valides et met à jour l'état global du formulaire
         updateFormValidationState();
+
     }
-
-
 
     public void validateDate(Calendar selectedDate) {
         // Obtention de la date actuelle
-        Calendar currentDate = Calendar.getInstance(); // heure et minute à minuit pile
+        Calendar currentDate = Calendar.getInstance();
+
+        // Initialisation de l'heure et des minutes à minuit
+        currentDate.set(Calendar.HOUR_OF_DAY, 0);
+        currentDate.set(Calendar.MINUTE, 0);
+        currentDate.set(Calendar.SECOND, 0);
+        currentDate.set(Calendar.MILLISECOND, 0);
 
         // Vérifie si la date sélectionnée est après ou égale à la date actuelle en ignorant l'heure
         boolean isValid = selectedDate != null && selectedDate.after(currentDate) || selectedDate.equals(currentDate);
@@ -111,48 +132,72 @@ public class AddMeetingViewModel extends ViewModel {
         isDateValidLiveData.setValue(isValid);
 
         if (isValid) {
+
             // Si la date est valide, mise à jour de la date sélectionnée
             setSelectedDate(selectedDate);
-        }
 
-        // Vérifie si tous les champs sont valides et met à jour l'état global du formulaire
-        updateFormValidationState();
+            updateFormValidationState();
+        }
     }
 
-    public void validateTime(Calendar selectedTime) { // si date de demain et heure antérieure à celle d'aujourd'hui ça doit fonctionné, vérif doit se faire uniquement à la date d'aujourd'hui
-        boolean isValid = selectedTime != null && selectedTime.after(Calendar.getInstance());
+    public void validateTime(Calendar selectedTime) {
+        boolean isValid = false;
+
+        if (selectedTime != null) {
+            Calendar currentDate = Calendar.getInstance();
+
+            if (selectedDate.after(currentDate) || (isSameDay(selectedDate, currentDate) && selectedTime.after(currentDate))) {
+                // Si le jour sélectionné est postérieur au jour actuel OU
+                // Si le jour sélectionné est le jour actuel et l'heure est postérieure à l'heure actuelle
+                isValid = true;
+            }
+        }
+
         isTimeValidLiveData.setValue(isValid);
 
         if (isValid) {
+
             // Si l'heure est valide, mise à jour de l'heure sélectionnée
             setSelectedTime(selectedTime);
-        }
 
-        // Vérifie si tous les champs sont valides et met à jour l'état global du formulaire
-        updateFormValidationState();
+            updateFormValidationState();
+        }
     }
+
+    private boolean isSameDay(Calendar cal1, Calendar cal2) {
+        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR)
+                && cal1.get(Calendar.MONTH) == cal2.get(Calendar.MONTH)
+                && cal1.get(Calendar.DAY_OF_MONTH) == cal2.get(Calendar.DAY_OF_MONTH);
+    }
+
 
     public void validateRoom(String selectedRoom) {
         isRoomValid = !TextUtils.isEmpty(selectedRoom);
 
         setSelectedRoom(selectedRoom); // fournir la valeur pour tous les champs
 
-        // Vérifie si tous les champs sont valides et met à jour l'état global du formulaire
         updateFormValidationState();
     }
 
-    public void validateParticipants(String emails) {
-        boolean isValid = areEmailsValid(emails);
-        areParticipantsValidLiveData.setValue(isValid);
+    public void validateParticipants(String email) {
+        boolean isValid = areEmailsValid(email);
 
         if (isValid) {
-            // Si les participants sont valides, mise à jour de la liste des participants
-            setSelectedRoom(emails);
+            if (!participantList.contains(email)) {
+                participantList.add(email);
+                setParticipantList(participantList);
+            } else {
+                // L'email est déjà dans la liste.
+                isValid = false;
+
+            }
         }
 
-        // Vérifie si tous les champs sont valides et met à jour l'état global du formulaire
+        areParticipantsValidLiveData.setValue(isValid);
+
         updateFormValidationState();
     }
+
 
     boolean areEmailsValid(String emails) {
 
@@ -160,36 +205,56 @@ public class AddMeetingViewModel extends ViewModel {
         return emails.matches(regex);
     }
 
-    private void updateFormValidationState() {
+    public void addParticipant(String email) {
+        List<String> updatedParticipantList = participantListLiveData.getValue();
 
-        boolean  isSubjectValid = !TextUtils.isEmpty(selectedSubject);
+        if (updatedParticipantList == null) {
+            updatedParticipantList = new ArrayList<>();
+        }
+
+        if (!updatedParticipantList.contains(email)) {
+            updatedParticipantList.add(email);
+            participantListLiveData.setValue(updatedParticipantList);
+        }
+    }
+
+    public void removeParticipant(String email) {
+        List<String> updatedParticipantList = new ArrayList<>(participantListLiveData.getValue());
+        updatedParticipantList.remove(email);
+        participantListLiveData.setValue(updatedParticipantList);
+    }
+
+    public void setParticipantList(List<String> participants) {
+        participantList = participants;
+    }
+
+    public void updateFormValidationState() {
+
+        boolean isSubjectValid = !TextUtils.isEmpty(selectedSubject);
         boolean isDateValid = isDateValidLiveData.getValue() != null && isDateValidLiveData.getValue();
         boolean isTimeValid = isTimeValidLiveData.getValue() != null && isTimeValidLiveData.getValue();
         boolean isRoomValid = !TextUtils.isEmpty(selectedRoom);
-        boolean areParticipantsValid = areParticipantsValidLiveData.getValue() != null && areParticipantsValidLiveData.getValue();
+        boolean areParticipantsValid = !participantList.isEmpty();
 
         // Mise à jour de l'état global du formulaire en fonction de la validité de tous les champs
         boolean isFormValid = isSubjectValid && isRoomValid && isDateValid && isTimeValid && areParticipantsValid;
         isFormValidLiveData.setValue(isFormValid);
     }
 
-    public void addMeetingToMeetingList(String subjectOfMeeting, String selectedRoom, Calendar selectedDate, Calendar selectedTime, String participantList) {
+    public void addMeetingToMeetingList(String subjectOfMeeting, String selectedRoom, Calendar selectedDate, Calendar selectedTime, List<String> participantList) {
 
-        // Vérifie que tous les champs sont remplis et valides
-        // enlever la ligne si le bouton s'active ou pas
+        // Conversion de la date et l'heure en un objet Date
+        Date meetingDateAndTime = createMeetingDate(selectedDate, selectedTime);
 
-            // Conversiion de la date et l'heure en un objet Date
-            Date meetingDateAndTime = createMeetingDate(selectedDate, selectedTime);
+        // Création d'une instance de la réunion avec les détails fournis
+        Meeting newMeeting = new Meeting(subjectOfMeeting, selectedRoom, meetingDateAndTime, participantList);
 
-            // Création d'une une instance de la réunion avec les détails fournis
-            Meeting newMeeting = new Meeting(subjectOfMeeting, selectedRoom, meetingDateAndTime, participantList);
+        // Appel à la méthode pour ajouter la réunion à la liste
+        addMeetingToMeetingListViaRepository(newMeeting);
 
-            // Appel à la méthode pour ajouter la réunion à la liste
-            addMeetingToMeetingListViaRepository(newMeeting);
-
-            // La réunion s'ajoute avec succès
-            meetingAddedSuccessfully.setValue(true);
-        }
+        // La réunion s'ajoute avec succès
+        meetingAddedSuccessfully.setValue(true);
+    }
 
     private Date createMeetingDate(Calendar selectedDate, Calendar selectedTime) {
 
@@ -209,6 +274,4 @@ public class AddMeetingViewModel extends ViewModel {
         // Ajout de la réunion à la liste via le repository
         meetingRepository.createMeeting(newMeeting);
     }
-
-
 }

@@ -1,5 +1,6 @@
 package com.example.mareu.ui;
 
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -81,9 +82,10 @@ public class MeetingListAdapter extends RecyclerView.Adapter<MeetingListAdapter.
             binding.mainInfo.setText(meetingInfo);
 
             // Deuxième TextView : Affiche les participants de la réunion
-            String participants = meeting.getMeetingParticipants();
+            List<String> participantsList = meeting.getMeetingParticipants();
 
-            binding.participants.setText(participants);
+            // Utilisez 'participantsList' pour définir le texte du composant après l'avoir joint avec des virgules et un espace
+            binding.participants.setText(TextUtils.join(", ", participantsList));
         }
     }
 
