@@ -33,16 +33,6 @@ public class MeetingListFragment extends Fragment implements MeetingItemListener
 
 
     @Override
-
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        // Récupère l'instance du MeetingSharedViewModel créée dans la MainActivity
-        meetingSharedViewModel = new ViewModelProvider(getActivity()).get(MeetingSharedViewModel.class);
-    }
-
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         ((MainActivity) requireActivity()).toolbarAndAddButtonAction(this);
@@ -55,12 +45,11 @@ public class MeetingListFragment extends Fragment implements MeetingItemListener
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        Log.d("TAG", "onViewCreated: ");
-
-
+        // Récupère l'instance du MeetingSharedViewModel créée dans la MainActivity
+        meetingSharedViewModel = new ViewModelProvider(getActivity()).get(MeetingSharedViewModel.class);
 
         // Crée une instance de l'adaptateur de la RecyclerView avec la liste des réunions du ViewModel
-        adapter = new MeetingListAdapter(new ArrayList<>(), this);
+        adapter = new MeetingListAdapter(meetingSharedViewModel.getMeetingsLiveData().getValue(), this);
 
         // Lie les vues du layout du fragment à leurs éléments correspondants grâce à View Binding
         FragmentMeetingListBinding binding = FragmentMeetingListBinding.bind(view);
@@ -77,7 +66,6 @@ public class MeetingListFragment extends Fragment implements MeetingItemListener
             @Override
             public void onChanged(List<Meeting> meetings) {
                 // Mettez à jour l'adaptateur avec la nouvelle liste de réunions
-                Log.d("TAG", "onChanged: " + meetings.size());
                 adapter.updateMeetings(meetings);
             }
         });

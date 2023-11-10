@@ -1,5 +1,6 @@
 package com.example.mareu.ui;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
@@ -23,6 +24,25 @@ public class MeetingSharedViewModel extends ViewModel {
 
     private List<Meeting> allMeetings; // Variable pour stocker la liste complète de toutes les réunions
 
+    private String currentFilter = ""; // Par défaut, pas de filtre
+
+    private Calendar currentDateFilter; // Par défaut, pas de filtre
+
+    public String getCurrentFilter() {
+        return currentFilter;
+    }
+
+    public void setCurrentFilter(String currentFilter) {
+        this.currentFilter = currentFilter;
+    }
+
+    public Calendar getCurrentDateFilter() {
+        return currentDateFilter;
+    }
+
+    public void setCurrentDateFilter(Calendar currentDateFilter) {
+        this.currentDateFilter = currentDateFilter;
+    }
 
     public LiveData<List<Meeting>> getMeetingsLiveData() {
         return meetingsLiveData;
@@ -36,14 +56,11 @@ public class MeetingSharedViewModel extends ViewModel {
     // Constructeur de MeetingSharedViewModel, prenant en argument un objet MeetingRepository
     public MeetingSharedViewModel (MeetingRepository meetingRepository) {
 
-        Log.d("TAG", "MeetingSharedViewModel: ");
-
         // Attribue le MeetingRepository reçu en argument à la variable de membre meetingRepository
        this.meetingRepository = meetingRepository;
 
        this.allMeetings = new ArrayList<>(meetingRepository.getMeetings()); // Initialisation de allMeetings avec la liste de réunions
 
-        Log.d("TAG", "MeetingSharedViewModel: ");
        // Initialise les LiveData avec la liste des réunions
         meetingsLiveData.setValue(this.meetingRepository.getMeetings());
     }
@@ -65,7 +82,7 @@ public class MeetingSharedViewModel extends ViewModel {
 
         // Met à jour la liste des réunions dans les LiveData
         List<Meeting> updatedMeetings = meetingRepository.getMeetings();
-        Log.d("TAG", "deleteMeeting: ");
+
         meetingsLiveData.postValue(updatedMeetings);
 
         // Mettez à jour la liste allMeetings
@@ -76,12 +93,12 @@ public class MeetingSharedViewModel extends ViewModel {
 
     public void filterMeetingsByRoom (String room) {
         List<Meeting> filteredMeetings = new ArrayList<>();
-        for (Meeting meeting : meetingRepository.getMeetings()) {
+        for (Meeting meeting : allMeetings) {
             if (meeting.getMeetingLocation().equals(room)) {
                 filteredMeetings.add(meeting);
             }
         }
-        Log.d("TAG", "filterMeetingsByRoom: ");
+
         meetingsLiveData.setValue(filteredMeetings);
     }
 
@@ -95,7 +112,7 @@ public class MeetingSharedViewModel extends ViewModel {
                 filteredMeetings.add(meeting);
             }
         }
-        Log.d("TAG", "filterMeetingsByDate: ");
+
         meetingsLiveData.setValue(filteredMeetings);
     }
 

@@ -40,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
 
     public MeetingSharedViewModel meetingSharedViewModel;
 
+    private MeetingRepository meetingRepository;
+
 
         @Override
         public boolean onCreateOptionsMenu(Menu menu) {
@@ -77,9 +79,6 @@ public class MainActivity extends AppCompatActivity {
                     // Si l'option "Filter by Date" est sélectionnée, affichage de la fenêtre de dialogue pour choisir une plage de dates
                     showDateSelectionDialog();
                     return true;
-
-
-
 
                 }
 
@@ -141,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         // Crée une nouvelle instance de MeetingViewModelFactory
-        MeetingViewModelFactory factory = new MeetingViewModelFactory();
+        MeetingViewModelFactory factory = new MeetingViewModelFactory(meetingRepository);
 
         // Utilise ViewModelProvider pour obtenir une instance de MeetingSharedViewModel en utilisant la factory créée ci-dessus
         meetingSharedViewModel = new ViewModelProvider(this, factory).get(MeetingSharedViewModel.class);

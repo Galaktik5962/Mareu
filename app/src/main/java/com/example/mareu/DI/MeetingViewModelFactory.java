@@ -12,10 +12,10 @@ public class MeetingViewModelFactory implements ViewModelProvider.Factory {
     private final MeetingRepository meetingRepository;
 
 
-    // Constructeur de la fabrication des ViewModels
-    public MeetingViewModelFactory() {
-        this.meetingRepository = DI.checkIfRepositoryExists(); // Si le repository existe ne pas le créer, sinon le créer
 
+    // Constructeur de la fabrication des ViewModels
+    public MeetingViewModelFactory(MeetingRepository meetingRepository) {
+        this.meetingRepository = DI.checkIfRepositoryExists(); // Si le repository existe ne pas le créer, sinon le créer
     }
 
     @Override

@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,6 +53,8 @@ public class AddMeetingFragment extends Fragment {
 
     private MeetingSharedViewModel meetingSharedViewModel;
 
+    private MeetingRepository meetingRepository;
+
     private FragmentAddMeetingBinding binding; // Déclaration de la variable pour le ViewBinding
 
     private String selectedRoom; // Déclarer la variable en dehors de la méthode
@@ -72,7 +75,7 @@ public class AddMeetingFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         // Crée une nouvelle instance de MeetingViewModelFactory
-        MeetingViewModelFactory factory = new MeetingViewModelFactory();
+        MeetingViewModelFactory factory = new MeetingViewModelFactory(meetingRepository);
 
         // Utilise ViewModelProvider pour obtenir une instance de AddMeetingViewModel en utilisant la factory créée
         addMeetingViewModel = new ViewModelProvider(this, factory).get(AddMeetingViewModel.class);

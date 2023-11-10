@@ -1,6 +1,7 @@
 package com.example.mareu.ui;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -18,6 +19,8 @@ public class AddMeetingViewModel extends ViewModel {
 
 
     private MeetingRepository meetingRepository;
+
+    private MeetingSharedViewModel meetingSharedViewModel;  // Ajout de cette ligne
 
 
     private boolean isSubjectValid = false;
@@ -46,8 +49,9 @@ public class AddMeetingViewModel extends ViewModel {
     private MutableLiveData<Boolean> meetingAddedSuccessfully = new MutableLiveData<>();
 
 
-    public AddMeetingViewModel(MeetingRepository meetingRepository) {
+    public AddMeetingViewModel(MeetingRepository meetingRepository) {  // Ajout de cette ligne
         this.meetingRepository = meetingRepository;
+        this.meetingSharedViewModel = meetingSharedViewModel;  // Ajout de cette ligne
     }
 
     public String getSelectedSubject() {
