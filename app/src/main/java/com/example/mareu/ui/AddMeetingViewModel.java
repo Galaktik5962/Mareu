@@ -14,14 +14,12 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 public class AddMeetingViewModel extends ViewModel {
 
 
     private MeetingRepository meetingRepository;
-
-    private MeetingSharedViewModel meetingSharedViewModel;  // Ajout de cette ligne
-
 
     private boolean isSubjectValid = false;
 
@@ -51,7 +49,6 @@ public class AddMeetingViewModel extends ViewModel {
 
     public AddMeetingViewModel(MeetingRepository meetingRepository) {  // Ajout de cette ligne
         this.meetingRepository = meetingRepository;
-        this.meetingSharedViewModel = meetingSharedViewModel;  // Ajout de cette ligne
     }
 
     public String getSelectedSubject() {
@@ -121,6 +118,7 @@ public class AddMeetingViewModel extends ViewModel {
     }
 
     public void validateDate(Calendar selectedDate) {
+
         // Obtention de la date actuelle
         Calendar currentDate = Calendar.getInstance();
 
@@ -130,13 +128,12 @@ public class AddMeetingViewModel extends ViewModel {
         currentDate.set(Calendar.SECOND, 0);
         currentDate.set(Calendar.MILLISECOND, 0);
 
-        // Vérifie si la date sélectionnée est après ou égale à la date actuelle en ignorant l'heure
-        boolean isValid = selectedDate != null && selectedDate.after(currentDate) || selectedDate.equals(currentDate);
+        // Vérifie si le jour sélectionné est postérieur ou égal au jour actuel
+        boolean isDateValid = selectedDate != null && !selectedDate.before(currentDate);
 
-        isDateValidLiveData.setValue(isValid);
+        isDateValidLiveData.setValue(isDateValid);
 
-        if (isValid) {
-
+        if (isDateValid) {
             // Si la date est valide, mise à jour de la date sélectionnée
             setSelectedDate(selectedDate);
 
@@ -144,18 +141,34 @@ public class AddMeetingViewModel extends ViewModel {
         }
     }
 
-    public void validateTime(Calendar selectedTime) {
-        boolean isValid = false;
+    public void checkTimeAfterDate() {
+        boolean isDateValid = isDateValidLiveData.getValue();
+        boolean isValid = true;
 
-        if (selectedTime != null) {
+        if (isDateValid && selectedTime != null) {
+            // Vérifie également l'heure et les minutes, indépendamment du jour de l'année
             Calendar currentDate = Calendar.getInstance();
 
-            if (selectedDate.after(currentDate) || (isSameDay(selectedDate, currentDate) && selectedTime.after(currentDate))) {
-                // Si le jour sélectionné est postérieur au jour actuel OU
-                // Si le jour sélectionné est le jour actuel et l'heure est postérieure à l'heure actuelle
-                isValid = true;
+
+            // Comparaison des heures et des minutes seulement
+            int hourComparison = selectedTime.get(Calendar.HOUR_OF_DAY) - currentDate.get(Calendar.HOUR_OF_DAY);
+            int minuteComparison = selectedTime.get(Calendar.MINUTE) - currentDate.get(Calendar.MINUTE);
+
+            if (hourComparison < 0 || (hourComparison == 0 && minuteComparison < 0)) {
+                // Si l'heure est antérieure à l'heure actuelle, isValid est false
+                isValid = false;
             }
         }
+
+        isTimeValidLiveData.setValue(isValid);
+    }
+
+
+    public void validateTime(Calendar selectedTime) {
+
+        Calendar currentDate = Calendar.getInstance();
+
+        boolean isValid = selectedTime!=null && (selectedDate.after(currentDate) || (isSameDay(selectedDate, currentDate) && selectedTime.after(currentDate)));
 
         isTimeValidLiveData.setValue(isValid);
 
@@ -165,8 +178,9 @@ public class AddMeetingViewModel extends ViewModel {
             setSelectedTime(selectedTime);
 
             updateFormValidationState();
+
+            }
         }
-    }
 
     private boolean isSameDay(Calendar cal1, Calendar cal2) {
         return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR)
@@ -181,6 +195,25 @@ public class AddMeetingViewModel extends ViewModel {
         setSelectedRoom(selectedRoom); // fournir la valeur pour tous les champs
 
         updateFormValidationState();
+    }
+
+    // Méthode pour valider la salle sélectionnée
+    public boolean RoomSelected (String selectedRoom) {
+        // Récupérez la liste des réunions existantes (vous pouvez l'obtenir à partir du Repository)
+        List<Meeting> existingMeetings = meetingRepository.getMeetings();
+
+        // Parcourez la liste des réunions pour vérifier si la salle est déjà occupée
+        for (Meeting meeting : existingMeetings) {
+            if (meeting.getMeetingLocation().equals(selectedRoom)) {
+                // La salle est déjà occupée, vous pouvez afficher un message d'erreur ou effectuer d'autres actions nécessaires
+                // et retourner false pour indiquer que la salle n'est pas valide.
+                return false;
+            }
+            //condition sur la date et l'heure
+        }
+
+        // Si la salle n'est pas occupée, retournez true pour indiquer que la salle est valide.
+        return true;
     }
 
     public void validateParticipants(String email) {
@@ -237,7 +270,7 @@ public class AddMeetingViewModel extends ViewModel {
         boolean isSubjectValid = !TextUtils.isEmpty(selectedSubject);
         boolean isDateValid = isDateValidLiveData.getValue() != null && isDateValidLiveData.getValue();
         boolean isTimeValid = isTimeValidLiveData.getValue() != null && isTimeValidLiveData.getValue();
-        boolean isRoomValid = !TextUtils.isEmpty(selectedRoom);
+        boolean isRoomValid = !TextUtils.isEmpty(selectedRoom) && RoomSelected(selectedRoom);
         boolean areParticipantsValid = !participantList.isEmpty();
 
         // Mise à jour de l'état global du formulaire en fonction de la validité de tous les champs
@@ -245,7 +278,7 @@ public class AddMeetingViewModel extends ViewModel {
         isFormValidLiveData.setValue(isFormValid);
     }
 
-    public void addMeetingToMeetingList(String subjectOfMeeting, String selectedRoom, Calendar selectedDate, Calendar selectedTime, List<String> participantList) {
+    public void addMeetingToMeetingList(String subjectOfMeeting, String selectedRoom, Calendar selectedDate, Calendar selectedTime, List<String> participantList) { // à tester
 
         // Conversion de la date et l'heure en un objet Date
         Date meetingDateAndTime = createMeetingDate(selectedDate, selectedTime);
@@ -258,6 +291,7 @@ public class AddMeetingViewModel extends ViewModel {
 
         // La réunion s'ajoute avec succès
         meetingAddedSuccessfully.setValue(true);
+
     }
 
     private Date createMeetingDate(Calendar selectedDate, Calendar selectedTime) {
@@ -277,5 +311,6 @@ public class AddMeetingViewModel extends ViewModel {
     private void addMeetingToMeetingListViaRepository(Meeting newMeeting) {
         // Ajout de la réunion à la liste via le repository
         meetingRepository.createMeeting(newMeeting);
+
     }
 }

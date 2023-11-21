@@ -80,6 +80,11 @@ public class MainActivity extends AppCompatActivity {
                     showDateSelectionDialog();
                     return true;
 
+                } else if (itemId == R.id.clear_filters) {
+                    // Si l'option "Clear Filters" est sélectionnée, réinitialisation des filtres
+                    meetingSharedViewModel.resetFilters();
+                    return true;
+
                 }
 
                 return false;
@@ -102,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
                 String selectedRoom = roomOptions[which];
 
                 // Appel de la méthode du ViewModel pour filtrer les réunions par salle
-                meetingSharedViewModel.filterMeetingsByRoom(selectedRoom);
+                meetingSharedViewModel.setFilterByRoom(selectedRoom);
             }
         });
 
@@ -124,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
             Calendar selectedDate = Calendar.getInstance();
             selectedDate.set(selectedYear, selectedMonth, selectedDay);
 
-            meetingSharedViewModel.filterMeetingsByDate(selectedDate);
+            meetingSharedViewModel.setFilterByDate(selectedDate);
 
         }, year, month, day);
 
@@ -148,8 +153,7 @@ public class MainActivity extends AppCompatActivity {
         // Obtention de la liste complète de réunions non filtrées depuis le repository
         List<Meeting> allMeetings = meetingSharedViewModel.getMeetings();
 
-        // Mise à jour de la liste de réunions dans le ViewModel partagé
-        meetingSharedViewModel.setAllMeetings(allMeetings);
+
 
         // Utilisation du View Binding pour lier le layout de l'activité à la classe MainActivity
         binding = ActivityMainBinding.inflate(getLayoutInflater());

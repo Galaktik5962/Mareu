@@ -49,7 +49,7 @@ public abstract class DummyMeetingGenerator {
         return calendar.getTime();
     }
 
-    static List<Meeting> generateMeetings() {
+    public static List<Meeting> generateMeetings() {
         return new ArrayList<>(DUMMY_MEETINGS);
     }
 

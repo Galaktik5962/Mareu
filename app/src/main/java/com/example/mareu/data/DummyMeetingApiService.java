@@ -2,7 +2,7 @@ package com.example.mareu.data;
 
 import android.util.Log;
 
-import java.util.Calendar;
+import java.util.ArrayList;
 import java.util.List;
 
 public class DummyMeetingApiService implements MeetingApiService {
@@ -22,17 +22,11 @@ public class DummyMeetingApiService implements MeetingApiService {
 
         @Override
         public void createMeeting(Meeting meeting) {
+
             meetings.add(meeting);
         }
 
 
-        @Override
-        public List<Meeting> getFilteredMeetingsByLocation() {
-            return null;
-        }
 
-        @Override
-        public List<Meeting> getFilteredMeetingsByDate() {
-            return null;
-        }
-}
+    }
+

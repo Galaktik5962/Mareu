@@ -67,6 +67,7 @@ public class MeetingListFragment extends Fragment implements MeetingItemListener
             public void onChanged(List<Meeting> meetings) {
                 // Mettez à jour l'adaptateur avec la nouvelle liste de réunions
                 adapter.updateMeetings(meetings);
+
             }
         });
     }

@@ -7,6 +7,8 @@ import android.content.DialogInterface;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -32,15 +34,12 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.mareu.DI.MeetingViewModelFactory;
 import com.example.mareu.MainActivity;
 import com.example.mareu.R;
-import com.example.mareu.data.DummyMeetingApiService;
 import com.example.mareu.data.DummyMeetingGenerator;
-import com.example.mareu.data.Meeting;
 import com.example.mareu.data.MeetingRepository;
 import com.example.mareu.databinding.FragmentAddMeetingBinding;
 import com.google.android.material.chip.Chip;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -133,8 +132,12 @@ public class AddMeetingFragment extends Fragment {
                     // La date n'est pas valide, affichage d'un message d'erreur
                     Toast.makeText(requireContext(), "la date n'est pas valide", Toast.LENGTH_SHORT).show();
 
-                    // Efface la date sélectionnée si elle n'est pas valide
-                    binding.dateDeLaReunion.setText("");
+                    // Utilisation d'un Handler pour effacer la date
+                    new Handler(Looper.getMainLooper()).post(new Runnable() {
+                        @Override
+                        public void run() {
+                            binding.dateDeLaReunion.setText(null);
+                        }});
                 }
             }
         });
@@ -146,13 +149,17 @@ public class AddMeetingFragment extends Fragment {
 
                     // Ne rien faire, les actions souhaitées sont effectuées à la sélection dans le TimePickerDialog
 
+
                 } else {
 
                     // L'heure n'est pas valide, affichage d'un message d'erreur
                     Toast.makeText(requireContext(), "l'heure n'est pas valide", Toast.LENGTH_SHORT).show();
 
-                    // Efface l'heure sélectionnée si elle n'est pas valide
-                    binding.heureDeLaReunion.setText("");
+                    new Handler(Looper.getMainLooper()).post(new Runnable() {
+                        @Override
+                        public void run() {
+                            binding.heureDeLaReunion.setText(null);
+                        }});
                 }
             }
         });
@@ -236,7 +243,19 @@ public class AddMeetingFragment extends Fragment {
 
                 // Récupére l'élément sélectionné et appelle la méthode de validation appropriée avec la valeur sélectionnée.
                 selectedRoom = salleList.get(position);
+
                 addMeetingViewModel.validateRoom(selectedRoom);
+
+                // Appel de la méthode pour valider la salle sélectionnée
+                boolean isRoomValid = addMeetingViewModel.RoomSelected(selectedRoom);
+
+                // Vous pouvez ajouter des actions supplémentaires ici en fonction du résultat de la validation
+                if (!isRoomValid) {
+                    Toast.makeText(requireContext(), "La salle est déjà occupée pour une réunion.", Toast.LENGTH_SHORT).show();
+                }
+
+                // Mettez à jour l'état de la validation du formulaire après la validation de la salle
+                addMeetingViewModel.updateFormValidationState();
             }
 
             @Override
@@ -252,7 +271,6 @@ public class AddMeetingFragment extends Fragment {
 
                     // Activer ou désactiver le bouton en fonction de l'état de la validation du formulaire
                     binding.buttonAddMeeting.setEnabled(isFormValid);
-
             }
         });
 
@@ -272,6 +290,9 @@ public class AddMeetingFragment extends Fragment {
 
                 // Utilisation de la méthode du ViewModel pour ajouter la réunion à la liste des réunions
                 addMeetingViewModel.addMeetingToMeetingList(subject, room, date, time, participantList);
+
+                meetingSharedViewModel.applyFiltersAndUpdateList();
+
 
             }
         });
@@ -346,7 +367,6 @@ public class AddMeetingFragment extends Fragment {
             private void showDatePicker() {
                 Calendar currentDate = Calendar.getInstance();
                 int year = currentDate.get(Calendar.YEAR);
-
                 int month = currentDate.get(Calendar.MONTH);
                 int day = currentDate.get(Calendar.DAY_OF_MONTH);
 
@@ -360,10 +380,13 @@ public class AddMeetingFragment extends Fragment {
 
                         // Mise à jour de la LiveData dans le ViewModel avec la date sélectionnée
                         addMeetingViewModel.validateDate(selectedCalendar);
+                        addMeetingViewModel.checkTimeAfterDate();
 
                         // Mise à jour de la vue de date avec la nouvelle date sélectionnée
                         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.FRANCE);
                         binding.dateDeLaReunion.setText(dateFormat.format(selectedCalendar.getTime()));
+
+
                     }
                 }, year, month, day);
 
@@ -379,14 +402,11 @@ public class AddMeetingFragment extends Fragment {
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
 
-
                         Calendar selectedCalendar = Calendar.getInstance();
                         selectedCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
                         selectedCalendar.set(Calendar.MINUTE, minute);
 
-
                         addMeetingViewModel.validateTime(selectedCalendar);
-
 
                         SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.FRANCE);
                         binding.heureDeLaReunion.setText(timeFormat.format(addMeetingViewModel.getSelectedTime().getTime()));

@@ -11,7 +11,7 @@ public class Meeting {
     private String subjectOfMeeting;
     private String meetingLocation;
     private Date meetingDateAndTime;
-    private List<String> meetingParticipants; // list string
+    private List<String> meetingParticipants;
 
     public Meeting (String subjectOfMeeting, String meetingLocation, Date meetingDateAndTime, List<String> meetingParticipants) {
         this.subjectOfMeeting = subjectOfMeeting;
