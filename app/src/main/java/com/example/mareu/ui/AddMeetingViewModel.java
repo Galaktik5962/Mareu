@@ -294,7 +294,7 @@ public class AddMeetingViewModel extends ViewModel {
 
     }
 
-    private Date createMeetingDate(Calendar selectedDate, Calendar selectedTime) {
+    public Date createMeetingDate(Calendar selectedDate, Calendar selectedTime) {
 
         // Combinaison de la date et l'heure pour créer une instance de Date
         Calendar meetingDateAndTime = Calendar.getInstance();

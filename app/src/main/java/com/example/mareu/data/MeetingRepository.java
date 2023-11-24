@@ -17,16 +17,15 @@ public class MeetingRepository {
 
     public List<Meeting> getMeetings() {
         return meetingApiService.getMeetings();
-    } // à tester
+    }
 
-    public void deleteMeeting(Meeting meeting) { // à tester
-
+    public void deleteMeeting(Meeting meeting) {
         meetingApiService.deleteMeeting(meeting);
     }
 
     public void createMeeting(Meeting meeting) {
         meetingApiService.createMeeting(meeting);
-    } // à tester
+    }
 
 
 }

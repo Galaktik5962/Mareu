@@ -7,6 +7,7 @@ public class DI {
 
     private static MeetingRepository meetingRepository;
 
+
     public static MeetingRepository checkIfRepositoryExists() {
         if (meetingRepository == null) {
             DummyMeetingApiService dummyMeetingApiService = new DummyMeetingApiService();

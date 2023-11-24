@@ -45,14 +45,11 @@ public class MeetingSharedViewModel extends ViewModel {
     }
 
 
-
-
     // Constructeur de MeetingSharedViewModel, prenant en argument un objet MeetingRepository
     public MeetingSharedViewModel(MeetingRepository meetingRepository) {
 
         // Attribue le MeetingRepository reçu en argument à la variable de membre meetingRepository
         this.meetingRepository = meetingRepository;
-
 
 
         // Initialise les LiveData avec la liste des réunions
