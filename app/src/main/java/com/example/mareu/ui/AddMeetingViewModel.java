@@ -10,6 +10,9 @@ import androidx.lifecycle.ViewModel;
 import com.example.mareu.data.Meeting;
 import com.example.mareu.data.MeetingRepository;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -190,31 +193,47 @@ public class AddMeetingViewModel extends ViewModel {
 
 
     public void validateRoom(String selectedRoom) {
-        isRoomValid = !TextUtils.isEmpty(selectedRoom);
+        boolean isRoomAvailable = isRoomAvailable(selectedRoom, selectedDate, selectedTime);
+        isRoomValid = !TextUtils.isEmpty(selectedRoom) && isRoomAvailable;
 
-        setSelectedRoom(selectedRoom); // fournir la valeur pour tous les champs
-
+        setSelectedRoom(selectedRoom);
         updateFormValidationState();
     }
 
-    // Méthode pour valider la salle sélectionnée
-    public boolean RoomSelected (String selectedRoom) {
-        // Récupérez la liste des réunions existantes (vous pouvez l'obtenir à partir du Repository)
+
+    public boolean isRoomAvailable(String selectedRoom, Calendar selectedDate, Calendar selectedTime) {
         List<Meeting> existingMeetings = meetingRepository.getMeetings();
 
-        // Parcourez la liste des réunions pour vérifier si la salle est déjà occupée
         for (Meeting meeting : existingMeetings) {
-            if (meeting.getMeetingLocation().equals(selectedRoom)) {
-                // La salle est déjà occupée, vous pouvez afficher un message d'erreur ou effectuer d'autres actions nécessaires
-                // et retourner false pour indiquer que la salle n'est pas valide.
+            if (meeting.getMeetingLocation().equals(selectedRoom) && isDateTimeOverlap(selectedDate, selectedTime, meeting)) {
+
                 return false;
             }
-            //condition sur la date et l'heure
         }
 
-        // Si la salle n'est pas occupée, retournez true pour indiquer que la salle est valide.
         return true;
     }
+
+    private boolean isDateTimeOverlap(Calendar selectedDate, Calendar selectedTime, Meeting meeting) {
+        Calendar meetingStartDateTime = convertDateToCalendar(meeting.getMeetingDateAndTime());
+
+        // Comparer les composants de date et d'heure individuellement
+        return selectedDate.get(Calendar.MONTH) == meetingStartDateTime.get(Calendar.MONTH)
+                && selectedDate.get(Calendar.DAY_OF_MONTH) == meetingStartDateTime.get(Calendar.DAY_OF_MONTH)
+                && selectedTime.get(Calendar.HOUR_OF_DAY) == meetingStartDateTime.get(Calendar.HOUR_OF_DAY)
+                && selectedTime.get(Calendar.MINUTE) == meetingStartDateTime.get(Calendar.MINUTE);
+    }
+
+    // Méthode pour convertir un objet Date en Calendar
+    private Calendar convertDateToCalendar(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        return calendar;
+    }
+
+
+
+
 
     public void validateParticipants(String email) {
         boolean isValid = areEmailsValid(email);
@@ -226,7 +245,6 @@ public class AddMeetingViewModel extends ViewModel {
             } else {
                 // L'email est déjà dans la liste.
                 isValid = false;
-
             }
         }
 
@@ -270,7 +288,7 @@ public class AddMeetingViewModel extends ViewModel {
         boolean isSubjectValid = !TextUtils.isEmpty(selectedSubject);
         boolean isDateValid = isDateValidLiveData.getValue() != null && isDateValidLiveData.getValue();
         boolean isTimeValid = isTimeValidLiveData.getValue() != null && isTimeValidLiveData.getValue();
-        boolean isRoomValid = !TextUtils.isEmpty(selectedRoom) && RoomSelected(selectedRoom);
+        boolean isRoomValid = !TextUtils.isEmpty(selectedRoom) && isRoomAvailable(selectedRoom, selectedDate, selectedTime);
         boolean areParticipantsValid = !participantList.isEmpty();
 
         // Mise à jour de l'état global du formulaire en fonction de la validité de tous les champs

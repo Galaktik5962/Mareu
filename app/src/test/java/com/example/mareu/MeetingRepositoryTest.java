@@ -28,6 +28,7 @@ public class MeetingRepositoryTest {
         // Initialisation de MeetingRepository avec dummyMeetingApiService
         meetingRepository = new MeetingRepository(dummyMeetingApiService);
 
+
     }
 
     @Test

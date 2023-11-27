@@ -28,6 +28,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -47,16 +48,12 @@ import java.util.Locale;
 public class AddMeetingFragment extends Fragment {
 
     private EditText input;
-
     private AddMeetingViewModel addMeetingViewModel;
-
     private MeetingSharedViewModel meetingSharedViewModel;
-
     private MeetingRepository meetingRepository;
-
     private FragmentAddMeetingBinding binding; // Déclaration de la variable pour le ViewBinding
-
     private String selectedRoom; // Déclarer la variable en dehors de la méthode
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -65,7 +62,6 @@ public class AddMeetingFragment extends Fragment {
         ((MainActivity) requireActivity()).toolbarAndAddButtonAction(this);
 
         // Inflate le layout associé au fragment et le relie à la vue parente (container)
-
             return inflater.inflate(R.layout.fragment_add_meeting, container, false);
         }
 
@@ -80,7 +76,6 @@ public class AddMeetingFragment extends Fragment {
         addMeetingViewModel = new ViewModelProvider(this, factory).get(AddMeetingViewModel.class);
 
         meetingSharedViewModel = new ViewModelProvider(requireActivity()).get(MeetingSharedViewModel.class);
-
 
         // Lie les vues du layout du fragment à leurs éléments correspondants grâce à View Binding
         binding = FragmentAddMeetingBinding.bind(view); // Initialisation de la variable binding ici
@@ -97,7 +92,6 @@ public class AddMeetingFragment extends Fragment {
 
         // Configuration du Spinner avec l'adaptateur
         salleSpinner.setAdapter(salleAdapter);
-
 
         binding.sujetDeLaReunion.addTextChangedListener(new TextWatcher() {
             @Override
@@ -149,7 +143,6 @@ public class AddMeetingFragment extends Fragment {
 
                     // Ne rien faire, les actions souhaitées sont effectuées à la sélection dans le TimePickerDialog
 
-
                 } else {
 
                     // L'heure n'est pas valide, affichage d'un message d'erreur
@@ -169,7 +162,6 @@ public class AddMeetingFragment extends Fragment {
             public void onChanged(Boolean areParticipantsValid) {
 
                 if (areParticipantsValid) {
-
 
                 } else {
                     // L'adresse e-mail n'est pas valide, affichage d'un message d'erreur
@@ -241,21 +233,28 @@ public class AddMeetingFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                // Récupére l'élément sélectionné et appelle la méthode de validation appropriée avec la valeur sélectionnée.
+                // Récupère l'élément sélectionné
                 selectedRoom = salleList.get(position);
 
-                addMeetingViewModel.validateRoom(selectedRoom);
+                // Utilise les variables du ViewModel pour obtenir les valeurs des champs
+                Calendar selectedDate = addMeetingViewModel.getSelectedDate();
+                Calendar selectedTime = addMeetingViewModel.getSelectedTime();
 
                 // Appel de la méthode pour valider la salle sélectionnée
-                boolean isRoomValid = addMeetingViewModel.RoomSelected(selectedRoom);
+                boolean isRoomValid = addMeetingViewModel.isRoomAvailable(selectedRoom, selectedDate, selectedTime);
 
-                // Vous pouvez ajouter des actions supplémentaires ici en fonction du résultat de la validation
+                // Afficher le message d'erreur si la salle n'est pas valide
                 if (!isRoomValid) {
-                    Toast.makeText(requireContext(), "La salle est déjà occupée pour une réunion.", Toast.LENGTH_SHORT).show();
+
+                    Toast.makeText(requireContext(), "La salle n'est pas disponible", Toast.LENGTH_SHORT).show();
+
+                    } else {
+
+                    // La salle est valide, appeler la méthode pour valider la salle et mettre à jour l'état du formulaire
+
                 }
 
-                // Mettez à jour l'état de la validation du formulaire après la validation de la salle
-                addMeetingViewModel.updateFormValidationState();
+                addMeetingViewModel.validateRoom(selectedRoom);
             }
 
             @Override
@@ -263,6 +262,7 @@ public class AddMeetingFragment extends Fragment {
                 // Ne rien faire en cas de sélection vide
             }
         });
+
 
         // Observer le LiveData isFormValidLiveData du ViewModel
         addMeetingViewModel.getIsFormValidLiveData().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
@@ -292,11 +292,8 @@ public class AddMeetingFragment extends Fragment {
                 addMeetingViewModel.addMeetingToMeetingList(subject, room, date, time, participantList);
 
                 meetingSharedViewModel.applyFiltersAndUpdateList();
-
-
             }
         });
-
 
         binding.buttonCancel.setOnClickListener(new View.OnClickListener() {
             @Override
