@@ -1,5 +1,4 @@
 package com.example.mareu.ui;
-
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
@@ -28,7 +27,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -144,6 +142,8 @@ public class AddMeetingFragment extends Fragment {
                     // Ne rien faire, les actions souhaitées sont effectuées à la sélection dans le TimePickerDialog
 
                 } else {
+
+                    Log.d("TAG", "onChanged: heure non valide");
 
                     // L'heure n'est pas valide, affichage d'un message d'erreur
                     Toast.makeText(requireContext(), "l'heure n'est pas valide", Toast.LENGTH_SHORT).show();
@@ -377,7 +377,7 @@ public class AddMeetingFragment extends Fragment {
 
                         // Mise à jour de la LiveData dans le ViewModel avec la date sélectionnée
                         addMeetingViewModel.validateDate(selectedCalendar);
-                        addMeetingViewModel.checkTimeAfterDate();
+//                        addMeetingViewModel.checkTimeAfterDate();
 
                         // Mise à jour de la vue de date avec la nouvelle date sélectionnée
                         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.FRANCE);

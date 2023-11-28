@@ -26,6 +26,14 @@ public class MeetingSharedViewModel extends ViewModel {
 
     private Calendar currentDateFilter = null; // Par défaut, pas de filtre
 
+    public String getCurrentFilter() {
+        return currentFilter;
+    }
+
+    public Calendar getCurrentDateFilter() {
+        return currentDateFilter;
+    }
+
     public void setFilterByRoom(String room) {
         currentFilter = room;
         currentDateFilter = null;
@@ -115,11 +123,11 @@ public class MeetingSharedViewModel extends ViewModel {
 
         List<Meeting> filteredMeetings;
 
-        if (TextUtils.isEmpty(currentFilter) && currentDateFilter == null) {
+        if (currentFilter.isEmpty() && currentDateFilter == null) {
             // Aucun filtre, récupérer toutes les réunions non filtrées
             filteredMeetings = meetingRepository.getMeetings();
 
-        } else if (!TextUtils.isEmpty(currentFilter)) {
+        } else if (!currentFilter.isEmpty()) {
             // Filtrer par salle
             filteredMeetings = filterMeetingsByRoom(currentFilter);
         } else {

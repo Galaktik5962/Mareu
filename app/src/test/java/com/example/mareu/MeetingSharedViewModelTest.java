@@ -1,8 +1,8 @@
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
-import androidx.lifecycle.MutableLiveData;
 
 import com.example.mareu.data.DummyMeetingApiService;
 import com.example.mareu.data.Meeting;
@@ -23,25 +23,22 @@ public class MeetingSharedViewModelTest {
     @Rule
     public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
     @Mock
-    private MutableLiveData<List<Meeting>> mockLiveData;
-    private MeetingSharedViewModel meetingSharedViewModel;
     private MeetingRepository meetingRepository;
-    private DummyMeetingApiService dummyMeetingApiService;
+    private MeetingSharedViewModel meetingSharedViewModel;
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        dummyMeetingApiService = new DummyMeetingApiService();
-        meetingRepository = new MeetingRepository(dummyMeetingApiService);
+        // Préparation des données de test
+        DummyMeetingApiService dummyMeetingApiService = new DummyMeetingApiService();
+        List<Meeting> allMeetings = dummyMeetingApiService.getMeetings();
 
-        // MockLiveData au lieu du LiveData réel
-        meetingSharedViewModel = new MeetingSharedViewModel(meetingRepository) {
-            @Override
-            public MutableLiveData<List<Meeting>> getMeetingsLiveData() {
-                return mockLiveData;
-            }
-        };
+        // Configure le comportement de meetingRepository.getMeetings()
+        when(meetingRepository.getMeetings()).thenReturn(allMeetings);
+
+        // Initialise le ViewModel avec le meetingRepository mocké
+        meetingSharedViewModel = new MeetingSharedViewModel(meetingRepository);
     }
 
     @Test
@@ -49,24 +46,42 @@ public class MeetingSharedViewModelTest {
         // Préparation des données de test
         List<Meeting> allMeetings = meetingRepository.getMeetings();
 
-        // Configure le comportement du mockLiveData
-        when(mockLiveData.getValue()).thenReturn(allMeetings);
-
         // Test avec aucun filtre
         meetingSharedViewModel.applyFiltersAndUpdateList();
-        verify(mockLiveData).setValue(allMeetings);
+
+        // Utilisez assertEquals pour comparer les valeurs directement à partir du LiveData de la classe
+        assertEquals(allMeetings, meetingSharedViewModel.getMeetingsLiveData().getValue());
 
         // Test avec un filtre par salle
         meetingSharedViewModel.setFilterByRoom("Room1");
         List<Meeting> filteredByRoom = meetingSharedViewModel.filterMeetingsByRoom("Room1");
         meetingSharedViewModel.applyFiltersAndUpdateList();
-        verify(mockLiveData).setValue(filteredByRoom);
+
+        // Utilisez assertEquals pour comparer les valeurs directement à partir du LiveData de la classe
+        assertEquals(filteredByRoom, meetingSharedViewModel.getMeetingsLiveData().getValue());
 
         // Test avec un filtre par date
         Calendar dateFilter = Calendar.getInstance();
         meetingSharedViewModel.setFilterByDate(dateFilter);
         List<Meeting> filteredByDate = meetingSharedViewModel.filterMeetingsByDate(dateFilter);
         meetingSharedViewModel.applyFiltersAndUpdateList();
-        verify(mockLiveData).setValue(filteredByDate);
+
+        // Utilisez assertEquals pour comparer les valeurs directement à partir du LiveData de la classe
+        assertEquals(filteredByDate, meetingSharedViewModel.getMeetingsLiveData().getValue());
+    }
+
+    @Test
+    public void testResetFilters() {
+        // Configurez les filtres actuels pour simuler un état filtré
+        meetingSharedViewModel.setFilterByRoom("Room1");
+        Calendar dateFilter = Calendar.getInstance();
+        meetingSharedViewModel.setFilterByDate(dateFilter);
+
+        // Appelez la méthode de réinitialisation des filtres
+        meetingSharedViewModel.resetFilters();
+
+        // Vérifiez que les filtres ont été réinitialisés correctement
+        assertEquals("", meetingSharedViewModel.getCurrentFilter());
+        assertEquals(null, meetingSharedViewModel.getCurrentDateFilter());
     }
 }

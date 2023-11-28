@@ -20,7 +20,7 @@ public class MeetingRepositoryTest {
 
 
     @Before
-    public void setUp() { // POSSIBILITE D UTILISER LA DI ?
+    public void setUp() {
 
         // Initialisation de dummyMeetingApiService
         dummyMeetingApiService = new DummyMeetingApiService();
