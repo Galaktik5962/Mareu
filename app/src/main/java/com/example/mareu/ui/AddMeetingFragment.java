@@ -377,7 +377,7 @@ public class AddMeetingFragment extends Fragment {
 
                         // Mise à jour de la LiveData dans le ViewModel avec la date sélectionnée
                         addMeetingViewModel.validateDate(selectedCalendar);
-//                        addMeetingViewModel.checkTimeAfterDate();
+                        addMeetingViewModel.checkTimeAfterDate();
 
                         // Mise à jour de la vue de date avec la nouvelle date sélectionnée
                         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.FRANCE);

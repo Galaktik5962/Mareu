@@ -125,13 +125,14 @@ public class AddMeetingViewModel extends ViewModel {
         // Obtention de la date actuelle
         Calendar currentDate = Calendar.getInstance();
 
-
+        // Initialisation de l'heure et des minutes à minuit
+        currentDate.set(Calendar.HOUR_OF_DAY, 0);
+        currentDate.set(Calendar.MINUTE, 0);
+        currentDate.set(Calendar.SECOND, 0);
+        currentDate.set(Calendar.MILLISECOND, 0);
 
         // Vérifie si le jour sélectionné est postérieur ou égal au jour actuel
-        boolean isDateValid = selectedDate != null && !selectedDate.before(currentDate)
-                || selectedTime!= null && (isSameDay(selectedDate, currentDate) && !selectedTime.before(currentDate))
-                || selectedDate.after(currentDate);
-
+        boolean isDateValid = selectedDate != null && !selectedDate.before(currentDate);
 
         isDateValidLiveData.setValue(isDateValid);
 
@@ -143,34 +144,34 @@ public class AddMeetingViewModel extends ViewModel {
         }
     }
 
-    // Initialisation de l'heure et des minutes à minuit
-//        currentDate.set(Calendar.HOUR_OF_DAY, 0);
-//        currentDate.set(Calendar.MINUTE, 0);
-//        currentDate.set(Calendar.SECOND, 0);
-//        currentDate.set(Calendar.MILLISECOND, 0);
+    public void checkTimeAfterDate() {
+        boolean isDateValid = isDateValidLiveData.getValue();
+        boolean isValid = true;
 
-//    public void checkTimeAfterDate() {
-//
-//        boolean isDateValid = isDateValidLiveData.getValue();
-//
-//        if (isDateValid) {
-//
-//            // Vérifie également l'heure et les minutes, indépendamment du jour de l'année
-//            Calendar currentDate = Calendar.getInstance();
-//
-//            boolean isValid = (isSameDay(selectedDate, currentDate) && selectedTime.after(currentDate)) || selectedTime.equals(currentDate);
-//
-//            isTimeValidLiveData.setValue(isValid);
-//        }
-//    }
+        if (isDateValid && selectedTime != null) {
+            // Vérifie également l'heure et les minutes, indépendamment du jour de l'année
+            Calendar currentDate = Calendar.getInstance();
+
+
+            // Comparaison des heures et des minutes seulement
+            int hourComparison = selectedTime.get(Calendar.HOUR_OF_DAY) - currentDate.get(Calendar.HOUR_OF_DAY);
+            int minuteComparison = selectedTime.get(Calendar.MINUTE) - currentDate.get(Calendar.MINUTE);
+
+            if (hourComparison < 0 || (hourComparison == 0 && minuteComparison < 0)) {
+                // Si l'heure est antérieure à l'heure actuelle, isValid est false
+                isValid = false;
+            }
+        }
+
+        isTimeValidLiveData.setValue(isValid);
+    }
 
 
     public void validateTime(Calendar selectedTime) {
 
         Calendar currentDate = Calendar.getInstance();
 
-        boolean isValid = selectedTime!=null && (selectedDate.after(currentDate)
-                || (isSameDay(selectedDate, currentDate) && selectedTime.after(currentDate)));
+        boolean isValid = selectedTime!=null && (selectedDate.after(currentDate) || (isSameDay(selectedDate, currentDate) && selectedTime.after(currentDate)));
 
         isTimeValidLiveData.setValue(isValid);
 
@@ -181,8 +182,8 @@ public class AddMeetingViewModel extends ViewModel {
 
             updateFormValidationState();
 
-            }
         }
+    }
 
     private boolean isSameDay(Calendar cal1, Calendar cal2) {
         return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR)
