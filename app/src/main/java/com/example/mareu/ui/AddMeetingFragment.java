@@ -137,7 +137,7 @@ public class AddMeetingFragment extends Fragment {
         addMeetingViewModel.getIsTimeValidLiveData().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean isTimeValid) {
-                if (isTimeValid) {
+                if (isTimeValid) { // faire un if !isTimeValid comme ça pas de else
 
                     // Ne rien faire, les actions souhaitées sont effectuées à la sélection dans le TimePickerDialog
 
@@ -279,7 +279,7 @@ public class AddMeetingFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                // Utilisation des méthodes du ViewModel pour obtenir les valeurs des champs
+                // Utilisation des méthodes du ViewModel pour obtenir les valeurs des champs / pas utiles
                 String subject = addMeetingViewModel.getSelectedSubject();
                 String room = addMeetingViewModel.getSelectedRoom();
                 Calendar date = addMeetingViewModel.getSelectedDate();

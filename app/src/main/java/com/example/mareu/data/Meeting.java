@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 public class Meeting {
 
@@ -56,4 +57,23 @@ public class Meeting {
     public void setMeetingParticipants(List<String> meetingParticipants) {
         this.meetingParticipants = meetingParticipants;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+
+        Meeting meeting = (Meeting) obj;
+
+        // Comparez les propriétés pertinentes ici (par exemple, salle et date)
+        return meetingLocation.equals(meeting.meetingLocation) && meetingDateAndTime.equals(meeting.meetingDateAndTime);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = meetingLocation.hashCode();
+        result = 31 * result + meetingLocation.hashCode();
+        return result;
+    }
+
 }

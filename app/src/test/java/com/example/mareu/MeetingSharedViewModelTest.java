@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 
 import com.example.mareu.data.DummyMeetingApiService;
+import com.example.mareu.data.DummyMeetingGenerator;
 import com.example.mareu.data.Meeting;
 import com.example.mareu.data.MeetingRepository;
 import com.example.mareu.ui.MeetingSharedViewModel;
@@ -16,6 +17,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 public class MeetingSharedViewModelTest {
@@ -34,6 +37,8 @@ public class MeetingSharedViewModelTest {
         DummyMeetingApiService dummyMeetingApiService = new DummyMeetingApiService();
         List<Meeting> allMeetings = dummyMeetingApiService.getMeetings();
 
+        //meetingRepository = new MeetingRepository(dummyMeetingApiService);
+
         // Configure le comportement de meetingRepository.getMeetings()
         when(meetingRepository.getMeetings()).thenReturn(allMeetings);
 
@@ -43,31 +48,33 @@ public class MeetingSharedViewModelTest {
 
     @Test
     public void testApplyFiltersAndUpdateList() {
-        // Préparation des données de test
-        List<Meeting> allMeetings = meetingRepository.getMeetings();
 
-        // Test avec aucun filtre
+        // Créez manuellement un objet Meeting avec les propriétés attendues
+        Meeting expectedMeeting = new Meeting("Test", "Room1", new GregorianCalendar(2023, 11, 30).getTime(), List.of("test@lamzone.com"));
+
+        // Configurez le comportement du mock
+        when(meetingRepository.getMeetings()).thenReturn(Collections.singletonList(expectedMeeting));
+
+        // Testez avec aucun filtre
         meetingSharedViewModel.applyFiltersAndUpdateList();
 
         // Utilisez assertEquals pour comparer les valeurs directement à partir du LiveData de la classe
-        assertEquals(allMeetings, meetingSharedViewModel.getMeetingsLiveData().getValue());
+        assertEquals(Collections.singletonList(expectedMeeting), meetingSharedViewModel.getMeetingsLiveData().getValue());
 
-        // Test avec un filtre par salle
+        // Testez avec un filtre par salle (Room1)
         meetingSharedViewModel.setFilterByRoom("Room1");
-        List<Meeting> filteredByRoom = meetingSharedViewModel.filterMeetingsByRoom("Room1");
         meetingSharedViewModel.applyFiltersAndUpdateList();
 
         // Utilisez assertEquals pour comparer les valeurs directement à partir du LiveData de la classe
-        assertEquals(filteredByRoom, meetingSharedViewModel.getMeetingsLiveData().getValue());
+        assertEquals(Collections.singletonList(expectedMeeting), meetingSharedViewModel.getMeetingsLiveData().getValue());
 
-        // Test avec un filtre par date
-        Calendar dateFilter = Calendar.getInstance();
+        // Testez avec un filtre par date (30/11/2023)
+        Calendar dateFilter = new GregorianCalendar(2023, 11, 30);
         meetingSharedViewModel.setFilterByDate(dateFilter);
-        List<Meeting> filteredByDate = meetingSharedViewModel.filterMeetingsByDate(dateFilter);
         meetingSharedViewModel.applyFiltersAndUpdateList();
 
         // Utilisez assertEquals pour comparer les valeurs directement à partir du LiveData de la classe
-        assertEquals(filteredByDate, meetingSharedViewModel.getMeetingsLiveData().getValue());
+        assertEquals(Collections.singletonList(expectedMeeting), meetingSharedViewModel.getMeetingsLiveData().getValue());
     }
 
     @Test
@@ -83,5 +90,10 @@ public class MeetingSharedViewModelTest {
         // Vérifiez que les filtres ont été réinitialisés correctement
         assertEquals("", meetingSharedViewModel.getCurrentFilter());
         assertEquals(null, meetingSharedViewModel.getCurrentDateFilter());
+
+        // apply filter + vérifier que mon LD renvoi bien allmeetings
+        meetingSharedViewModel.applyFiltersAndUpdateList();
+        assertEquals(meetingRepository.getMeetings(), meetingSharedViewModel.getMeetingsLiveData().getValue());
+
     }
 }
