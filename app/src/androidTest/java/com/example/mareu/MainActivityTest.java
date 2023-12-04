@@ -7,12 +7,16 @@ import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static androidx.test.espresso.action.ViewActions.replaceText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withClassName;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.anything;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 
 import android.view.View;
@@ -23,6 +27,8 @@ import android.widget.TimePicker;
 
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.espresso.NoMatchingViewException;
+import androidx.test.espresso.UiController;
+import androidx.test.espresso.ViewAction;
 import androidx.test.espresso.ViewAssertion;
 import androidx.test.espresso.contrib.PickerActions;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
@@ -72,11 +78,48 @@ public class MainActivityTest {
         onView(withId(android.R.id.button1)).perform(click());
 
         onView(withId(R.id.button_add_meeting)).perform(click());
+
+        // Utilise l'assertion RecyclerViewItemCountAssertion pour vérifier que le nombre d'éléments a augmenté de 1.
+        onView(withId(R.id.recycler_view)).check(new RecyclerViewItemCountAssertion(10 + 1));
+    }
+
+    @Test
+    public void deleteMeetingTest() {
+
+        // Utilise l'assertion RecyclerViewItemCountAssertion pour vérifier que le nombre d'éléments est égal à 10.
+        onView(withId(R.id.recycler_view)).check(new RecyclerViewItemCountAssertion(10));
+
+        // Clic sur le bouton "delete" du premier élément de la liste
+        onView(childAtPosition(withId(R.id.recycler_view), 0))
+                .perform(clickChildViewWithId(R.id.delete_button));
+
+        // Utilise l'assertion RecyclerViewItemCountAssertion pour vérifier que le nombre d'éléments a diminué de 1.
+        onView(withId(R.id.recycler_view)).check(new RecyclerViewItemCountAssertion(10 - 1));
+
+    }
+
+    @Test
+    public void filterMeetingsByRoomTest () {
+
+        onView(withId(R.id.recycler_view)).check(new RecyclerViewItemCountAssertion(10));
+
+        onView(withId(R.id.filter_icon)).perform(click());
+
+        onView(withText("Filtrer par salle")).perform(click());
+
+        onView(withText("Room 3")).perform(click());
+
+        onView(withId(R.id.recycler_view)).check(new RecyclerViewItemCountAssertion(1));
+
+        // Vérifie que la description de la réunion affichée contient "Room 3"
+        onView(allOf(withId(R.id.main_info), withText(containsString("Room 3"))))
+                .check(matches(isDisplayed()));
+
     }
 
     private static Matcher<View> childAtPosition(
-        final Matcher<View> parentMatcher,
-        final int position
+            final Matcher<View> parentMatcher,
+            final int position
     ) {
 
         return new TypeSafeMatcher<View>() {
@@ -90,10 +133,35 @@ public class MainActivityTest {
             public boolean matchesSafely(View view) {
                 ViewParent parent = view.getParent();
                 return parent instanceof ViewGroup && parentMatcher.matches(parent)
-                    && view.equals(((ViewGroup) parent).getChildAt(position));
+                        && view.equals(((ViewGroup) parent).getChildAt(position));
             }
         };
     }
+
+    public static ViewAction clickChildViewWithId(final int childId) {
+        return new ViewAction() {
+            @Override
+            public Matcher<View> getConstraints() {
+                return allOf(isAssignableFrom(View.class), isDisplayed());
+            }
+
+            @Override
+            public String getDescription() {
+                return "Click on a child view with specified id.";
+            }
+
+            @Override
+            public void perform(UiController uiController, View view) {
+                View childView = view.findViewById(childId);
+                if (childView != null) {
+                    childView.performClick();
+                } else {
+                    throw new RuntimeException("Child view with id " + childId + " not found.");
+                }
+            }
+        };
+    }
+
 }
 
 class RecyclerViewItemCountAssertion implements ViewAssertion {
@@ -105,8 +173,8 @@ class RecyclerViewItemCountAssertion implements ViewAssertion {
 
     @Override
     public void check(
-        View view,
-        NoMatchingViewException noViewFoundException
+            View view,
+            NoMatchingViewException noViewFoundException
     ) {
         if (noViewFoundException != null) {
             throw noViewFoundException;
@@ -116,6 +184,5 @@ class RecyclerViewItemCountAssertion implements ViewAssertion {
         RecyclerView.Adapter adapter = recyclerView.getAdapter();
         assertThat(adapter.getItemCount(), is(expectedCount));
     }
+
 }
-
-
