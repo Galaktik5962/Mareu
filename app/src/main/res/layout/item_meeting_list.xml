@@ -23,7 +23,7 @@
 
     <TextView
         android:id="@+id/main_info"
-        android:layout_width="250dp"
+        android:layout_width="0dp"
         android:layout_marginTop="15dp"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
@@ -48,17 +48,15 @@
 
     <TextView
         android:id="@+id/participants"
-        android:ellipsize="end"
-        android:layout_width="250dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="15dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp"
-        android:layout_height="20dp"
+        android:ellipsize="end"
         android:singleLine="true"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/delete_button"
-        app:layout_constraintStart_toEndOf="@+id/avatar_meeting_room"
-        app:layout_constraintWidth_default="wrap"
-        tools:text="Adresses mails des participants"/>
+        app:layout_constraintEnd_toEndOf="@+id/main_info"
+        app:layout_constraintStart_toStartOf="@+id/main_info"
+        app:layout_constraintTop_toBottomOf="@+id/main_info"
+        tools:text="Adresses mails des participants" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
