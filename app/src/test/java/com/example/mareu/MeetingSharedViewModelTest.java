@@ -1,5 +1,9 @@
+/**
+ * JUnit test class for validating the functionality of the MeetingSharedViewModel.
+ * Tests include applying filters, updating the list, and resetting filters.
+ */
+
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
@@ -29,69 +33,75 @@ public class MeetingSharedViewModelTest {
     private MeetingRepository meetingRepository;
     private MeetingSharedViewModel meetingSharedViewModel;
 
+    /**
+     * Set up the test environment by initializing the required services and repositories.
+     */
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        // Préparation des données de test
+        // Prepare test data
         DummyMeetingApiService dummyMeetingApiService = new DummyMeetingApiService();
         List<Meeting> allMeetings = dummyMeetingApiService.getMeetings();
 
-        //meetingRepository = new MeetingRepository(dummyMeetingApiService);
-
-        // Configure le comportement de meetingRepository.getMeetings()
+        // Configure the behavior of meetingRepository.getMeetings()
         when(meetingRepository.getMeetings()).thenReturn(allMeetings);
 
-        // Initialise le ViewModel avec le meetingRepository mocké
+        // Initialize the ViewModel with the mocked meetingRepository
         meetingSharedViewModel = new MeetingSharedViewModel(meetingRepository);
     }
 
+    /**
+     * Test the functionality of applying filters and updating the list of meetings.
+     */
     @Test
     public void testApplyFiltersAndUpdateList() {
 
-        // Créez manuellement un objet Meeting avec les propriétés attendues
-        Meeting expectedMeeting = new Meeting("Test", "Room1", new GregorianCalendar(2023, 11, 30).getTime(), List.of("test@lamzone.com"));
+        // Manually create a Meeting object with the expected properties
+        Meeting expectedMeeting = new Meeting("Test", "Room1", DummyMeetingGenerator.generateDate(2023,11,30), DummyMeetingGenerator.generateTime(14,00), List.of("test@lamzone.com"));
 
-        // Configurez le comportement du mock
+        // Configure the behavior of the mock
         when(meetingRepository.getMeetings()).thenReturn(Collections.singletonList(expectedMeeting));
 
-        // Testez avec aucun filtre
+        // Test with no filters
         meetingSharedViewModel.applyFiltersAndUpdateList();
 
-        // Utilisez assertEquals pour comparer les valeurs directement à partir du LiveData de la classe
+        // Use assertEquals to compare values directly from the LiveData of the class
         assertEquals(Collections.singletonList(expectedMeeting), meetingSharedViewModel.getMeetingsLiveData().getValue());
 
-        // Testez avec un filtre par salle (Room1)
+        // Test with a filter by room (Room1)
         meetingSharedViewModel.setFilterByRoom("Room1");
         meetingSharedViewModel.applyFiltersAndUpdateList();
 
-        // Utilisez assertEquals pour comparer les valeurs directement à partir du LiveData de la classe
         assertEquals(Collections.singletonList(expectedMeeting), meetingSharedViewModel.getMeetingsLiveData().getValue());
 
-        // Testez avec un filtre par date (30/11/2023)
+        // Test with a filter by room (Room1)
         Calendar dateFilter = new GregorianCalendar(2023, 11, 30);
         meetingSharedViewModel.setFilterByDate(dateFilter);
         meetingSharedViewModel.applyFiltersAndUpdateList();
 
-        // Utilisez assertEquals pour comparer les valeurs directement à partir du LiveData de la classe
         assertEquals(Collections.singletonList(expectedMeeting), meetingSharedViewModel.getMeetingsLiveData().getValue());
     }
 
+    /**
+     * Test the functionality of resetting filters.
+     */
     @Test
     public void testResetFilters() {
-        // Configurez les filtres actuels pour simuler un état filtré
+
+        // Configure the current filters to simulate a filtered state
         meetingSharedViewModel.setFilterByRoom("Room1");
         Calendar dateFilter = Calendar.getInstance();
         meetingSharedViewModel.setFilterByDate(dateFilter);
 
-        // Appelez la méthode de réinitialisation des filtres
+        // Call the method to reset filters
         meetingSharedViewModel.resetFilters();
 
-        // Vérifiez que les filtres ont été réinitialisés correctement
+        // Verify that the filters have been reset correctly
         assertEquals("", meetingSharedViewModel.getCurrentFilter());
         assertEquals(null, meetingSharedViewModel.getCurrentDateFilter());
 
-        // apply filter + vérifier que mon LD renvoi bien allmeetings
+        // Apply filter and verify that my LiveData correctly returns all meetings
         meetingSharedViewModel.applyFiltersAndUpdateList();
         assertEquals(meetingRepository.getMeetings(), meetingSharedViewModel.getMeetingsLiveData().getValue());
 

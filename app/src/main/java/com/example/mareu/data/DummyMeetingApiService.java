@@ -1,32 +1,38 @@
 package com.example.mareu.data;
 
-import android.util.Log;
-
-import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Dummy implementation of the {@link MeetingApiService} interface for testing purposes.
+ */
 public class DummyMeetingApiService implements MeetingApiService {
 
-        private List<Meeting> meetings = DummyMeetingGenerator.generateMeetings();
+    /**
+     * List of meetings generated using {@link DummyMeetingGenerator}.
+     */
+    private List<Meeting> meetings = DummyMeetingGenerator.generateMeetings();
 
-        @Override
-        public List<Meeting> getMeetings() {
-            return meetings;
-        }
-
-        @Override
-        public void deleteMeeting(Meeting meeting) {
-
-            meetings.remove(meeting);
-        }
-
-        @Override
-        public void createMeeting(Meeting meeting) {
-
-            meetings.add(meeting);
-        }
-
-
-
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<Meeting> getMeetings() {
+        return meetings;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void deleteMeeting(Meeting meeting) {
+        meetings.remove(meeting);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void createMeeting(Meeting meeting) {
+        meetings.add(meeting);
+    }
+}

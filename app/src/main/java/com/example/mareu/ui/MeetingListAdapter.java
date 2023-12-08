@@ -12,87 +12,132 @@ import com.example.mareu.databinding.ItemMeetingListBinding;
 
 import java.util.List;
 
+/**
+ * Adapter class for the RecyclerView in the MeetingListFragment.
+ * Responsible for creating ViewHolders and binding meeting data to them.
+ */
 public class MeetingListAdapter extends RecyclerView.Adapter<MeetingListAdapter.MeetingViewHolder> {
 
-    // Liste des réunions à afficher dans l'adaptateur
+    /**
+     * List of meetings to be displayed in the adapter.
+     */
     private List<Meeting> meetings;
 
+    /**
+     * Listener interface for handling click events on meeting items.
+     */
     private MeetingItemListener meetingItemListener;
 
-    // Constructeur de l'adaptateur qui reçoit la liste des réunions
+    /**
+     * Constructs a MeetingListAdapter with the specified list of meetings and a listener for item clicks.
+     *
+     * @param meetings              List of meetings to be displayed.
+     * @param meetingItemListener   Listener for item click events.
+     */
     public MeetingListAdapter(List<Meeting> meetings, MeetingItemListener meetingItemListener) {
-
         this.meetings = meetings;
         this.meetingItemListener = meetingItemListener;
     }
 
+    /**
+     * Creates and returns a new MeetingViewHolder with the specified parent and view type.
+     *
+     * @param parent    The ViewGroup into which the new View will be added.
+     * @param viewType  The view type of the new View.
+     * @return          A new MeetingViewHolder that holds a View of the given view type.
+     */
     @NonNull
     @Override
     public MeetingViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-
-        // Crée un inflateur pour convertir le layout XML en objet View
+        // Create a new view
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-
-        // Utilise ViewBinding pour créer et lier les vues du layout item_meeting_list.xml
+        // Inflate the custom binding layout
         ItemMeetingListBinding binding = ItemMeetingListBinding.inflate(inflater, parent, false);
-
-        // Crée un ViewHolder en utilisant le Binding
         return new MeetingViewHolder(binding);
     }
 
+    /**
+     * Binds the meeting data to the specified holder at the given position.
+     *
+     * @param holder    The MeetingViewHolder to bind the data to.
+     * @param position  The position of the item within the adapter's data set.
+     */
     @Override
     public void onBindViewHolder(@NonNull MeetingViewHolder holder, int position) {
-
-        // Récupère la réunion à la position donnée dans la liste
+        // Get the meeting object at the specified position
         Meeting meeting = meetings.get(position);
-
-        // Appelle la méthode bind du ViewHolder pour remplir les vues avec les données de la réunion
+        // Bind the meeting details to the ViewHolder
         holder.bind(meeting);
-
-        // Écouteur de clic pour le bouton de suppression
-        holder.binding.deleteButton.setOnClickListener(v -> {
-               meetingItemListener.onDeleteClick(meeting);
-            });
+        // Set up a click listener for the delete button
+        holder.binding.deleteButton.setOnClickListener(v -> meetingItemListener.onDeleteClick(meeting));
     }
 
+    /**
+     * Returns the total number of meetings in the adapter's data set.
+     *
+     * @return The total number of meetings in the adapter.
+     */
     @Override
     public int getItemCount() {
-
-        // Retourne le nombre total de réunions dans la liste
+        // Return the total number of meetings in the list
         return meetings.size();
     }
 
-    // Classe interne pour représenter chaque élément de la liste (ViewHolder)
+    /**
+     * ViewHolder class for holding views associated with individual meeting items.
+     * This class is responsible for binding meeting data to the views within the item layout.
+     */
     public class MeetingViewHolder extends RecyclerView.ViewHolder {
 
+        /**
+         * Binding object for the item layout.
+         */
         private ItemMeetingListBinding binding;
 
+        /**
+         * Constructs a MeetingViewHolder with the specified binding.
+         *
+         * @param binding   The binding for the item layout.
+         */
         public MeetingViewHolder(@NonNull ItemMeetingListBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
         }
 
-        // Méthode pour remplir les vues du ViewHolder avec les détails de la réunion
+        /**
+         * Binds the meeting data to the views within the ViewHolder.
+         *
+         * @param meeting   The Meeting object containing the data to bind.
+         */
         public void bind(Meeting meeting) {
+            // Use the new methods to get formatted dates and times
+            String formattedDate = meeting.getFormattedDate();
+            String formattedTime = meeting.getFormattedTime();
 
-            // Premier TextView : Affiche le sujet, l'heure et l'endroit de la réunion
+            // First TextView: Display the subject, time, and location of the meeting
             String meetingInfo = meeting.getSubjectOfMeeting() + " - "
-                    + meeting.getFormattedMeetingDateAndTime() + " - "
+                    + formattedDate + " - "
+                    + formattedTime + " - "
                     + meeting.getMeetingLocation();
             binding.mainInfo.setText(meetingInfo);
 
-            // Deuxième TextView : Affiche les participants de la réunion
+            // Second TextView: Display the participants of the meeting
             List<String> participantsList = meeting.getMeetingParticipants();
 
-            // Utilisez 'participantsList' pour définir le texte du composant après l'avoir joint avec des virgules et un espace
+            // Use 'participantsList' to set the text of the component after joining it with commas and a space
             binding.participants.setText(TextUtils.join(", ", participantsList));
         }
     }
 
-    // Méthode pour mettre à jour la liste des réunions
+    /**
+     * Updates the list of meetings and notifies the adapter of the data set change.
+     *
+     * @param newMeetings   The new list of meetings to update the adapter with.
+     */
     public void updateMeetings(List<Meeting> newMeetings) {
         meetings = newMeetings;
         notifyDataSetChanged();
     }
 }
+
 

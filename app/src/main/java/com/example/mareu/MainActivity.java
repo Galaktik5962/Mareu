@@ -3,88 +3,109 @@ package com.example.mareu;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.DatePicker;
 import android.widget.PopupMenu;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.mareu.DI.MeetingViewModelFactory;
-import com.example.mareu.data.DummyMeetingApiService;
 import com.example.mareu.data.DummyMeetingGenerator;
 import com.example.mareu.data.Meeting;
-import com.example.mareu.data.MeetingApiService;
 import com.example.mareu.data.MeetingRepository;
 import com.example.mareu.databinding.ActivityMainBinding;
 import com.example.mareu.ui.AddMeetingFragment;
 import com.example.mareu.ui.MeetingListFragment;
 import com.example.mareu.ui.MeetingSharedViewModel;
 
-
 import java.util.Calendar;
 import java.util.List;
 
+/**
+ * MainActivity class representing the main entry point of the application.
+ * This activity manages the app's UI and functionality, including fragments for meeting lists and meeting addition.
+ */
 public class MainActivity extends AppCompatActivity {
 
+    /**
+     * Data-binding class for the main activity layout.
+     */
     private ActivityMainBinding binding;
 
+    /**
+     * ViewModel shared between fragments to manage meeting-related data.
+     */
     public MeetingSharedViewModel meetingSharedViewModel;
 
+    /**
+     * Repository class responsible for managing meeting data and providing access to the list of meetings.
+     * It does not handle filters directly but serves as a data source for filtered lists in the ViewModel.
+     */
     private MeetingRepository meetingRepository;
 
-
+    /**
+     * Initializes the contents of the Activity's options menu.
+     *
+     * @param menu The options menu in which the items are placed.
+     * @return true for the menu to be displayed; false for it to be hidden.
+     */
         @Override
         public boolean onCreateOptionsMenu(Menu menu) {
             getMenuInflater().inflate(R.menu.filter_menu, menu);
             return true;
         }
 
+    /**
+     * Called when a menu item is selected.
+     *
+     * @param item The selected menu item.
+     * @return true if the menu item selection is handled; otherwise, false.
+     */
         @Override
         public boolean onOptionsItemSelected(MenuItem item) {
             int id = item.getItemId();
 
             if (id == R.id.filter_icon) {
-                // Affichage du PopupMenu lorsque l'élément "filter_icon" est sélectionné
+                // Displays the PopupMenu when the "filter_icon" item is selected
                 showPopupMenu();
                 return true;
             }
             return super.onOptionsItemSelected(item);
         }
 
+    /**
+     * Displays a PopupMenu for filtering options when the "filter_icon" item is selected.
+     * The PopupMenu contains options to filter meetings by room, date, or clear filters.
+     */
         private void showPopupMenu() {
             PopupMenu popupMenu = new PopupMenu(this, findViewById(R.id.filter_icon));
             MenuInflater inflater = popupMenu.getMenuInflater();
             inflater.inflate(R.menu.filter_popup_menu, popupMenu.getMenu());
 
-            // Écouteur de clic pour gérer les éléments du menu
+            // Click listener to handle menu item selections
             popupMenu.setOnMenuItemClickListener(item -> {
                 int itemId = item.getItemId();
 
                 if (itemId == R.id.filter_by_room) {
-                    // Si l'option "Filter by Room" est sélectionnée, affichage de la fenêtre de dialogue pour choisir une salle
+                    // If "Filter by Room" option is selected, display the dialog to choose a room
                     showRoomSelectionDialog();
                     return true;
 
                 }  else if (itemId == R.id.filter_by_date) {
-                    // Si l'option "Filter by Date" est sélectionnée, affichage de la fenêtre de dialogue pour choisir une plage de dates
+                    // If "Filter by Date" option is selected, display the dialog to choose a date
                     showDateSelectionDialog();
                     return true;
 
                 } else if (itemId == R.id.clear_filters) {
-                    // Si l'option "Clear Filters" est sélectionnée, réinitialisation des filtres
+                    // If "Clear Filters" option is selected, reset filters
                     meetingSharedViewModel.resetFilters();
                     return true;
-
                 }
 
                 return false;
@@ -93,48 +114,62 @@ public class MainActivity extends AppCompatActivity {
             popupMenu.show();
         }
 
+    /**
+     * Displays a dialog for selecting a meeting room.
+     * The dialog presents a list of room options retrieved from DummyMeetingGenerator.
+     * When a room is selected, the ViewModel method is called to filter meetings by the selected room.
+     */
     private void showRoomSelectionDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Selectionnez une salle"); // Titre de la fenêtre de dialogue
+        builder.setTitle("Selectionnez une salle");
 
-        // Accédez à la liste de salles depuis DummyMeetingGenerator
+        // Access the list of rooms from DummyMeetingGenerator
         String[] roomOptions = DummyMeetingGenerator.getDUMMY_ROOMS().toArray(new String[0]);
-
 
         builder.setItems(roomOptions, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String selectedRoom = roomOptions[which];
 
-                // Appel de la méthode du ViewModel pour filtrer les réunions par salle
+                // Call the ViewModel method to filter meetings by room
                 meetingSharedViewModel.setFilterByRoom(selectedRoom);
             }
         });
 
-        builder.setNegativeButton("Annuler", null); // Bouton Annuler
+        builder.setNegativeButton("Annuler", null);
         AlertDialog dialog = builder.create();
         dialog.show();
     }
 
+    /**
+     * Displays a dialog for selecting a date.
+     * The dialog uses a DatePickerDialog to allow the user to pick a date.
+     * When a date is selected, a Calendar object is created for the selected date,
+     * and the ViewModel method is called to filter meetings by the selected date.
+     */
     private void showDateSelectionDialog() {
 
+        // Get the current date
         final Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
+        // Create a DatePickerDialog for date selection
         DatePickerDialog datePickerDialog = new DatePickerDialog(this, (view, selectedYear, selectedMonth, selectedDay) -> {
 
-            // Création d'objet Calendar pour la date sélectionnée
+            // Create a Calendar object for the selected date
             Calendar selectedDate = Calendar.getInstance();
             selectedDate.set(selectedYear, selectedMonth, selectedDay);
 
+            // Call the ViewModel method to filter meetings by date
             meetingSharedViewModel.setFilterByDate(selectedDate);
 
         }, year, month, day);
 
+        // Set the "Cancel" button action to dismiss the dialog
         datePickerDialog.setButton(DatePickerDialog.BUTTON_NEGATIVE, "Annuler", (dialog, which) -> {
-            dialog.dismiss(); // Ferme le dialogue
+            dialog.dismiss();
         });
 
         datePickerDialog.show();
@@ -144,47 +179,50 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Crée une nouvelle instance de MeetingViewModelFactory
+        // Create a new instance of MeetingViewModelFactory
         MeetingViewModelFactory factory = new MeetingViewModelFactory(meetingRepository);
 
-        // Utilise ViewModelProvider pour obtenir une instance de MeetingSharedViewModel en utilisant la factory créée ci-dessus
+        // Use ViewModelProvider to obtain an instance of MeetingSharedViewModel using the created factory
         meetingSharedViewModel = new ViewModelProvider(this, factory).get(MeetingSharedViewModel.class);
 
-        // Obtention de la liste complète de réunions non filtrées depuis le repository
+        // Get the complete list of unfiltered meetings from the repository
         List<Meeting> allMeetings = meetingSharedViewModel.getMeetings();
 
-
-
-        // Utilisation du View Binding pour lier le layout de l'activité à la classe MainActivity
+        // Use View Binding to link the activity layout to the MainActivity class
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        setSupportActionBar(binding.toolbar); // Configuration de la Toolbar avec le View Binding
+        setSupportActionBar(binding.toolbar); // Configure the Toolbar with View Binding
 
-        // Si l'activité est créée pour la première fois, ajoute le fragment de la liste des réunions
+        // If the activity is created for the first time, add the fragment for the list of meetings
         if (savedInstanceState == null) {
 
-            // Obtient le gestionnaire de fragments pour gérer les fragments de l'activité
+            // Get the fragment manager to manage the activity's fragments
             FragmentManager fragmentManager = getSupportFragmentManager();
 
-            // Démarre une transaction de fragment pour remplacer le conteneur de fragment par le fragment "MeetingListFragment"
+            // Start a fragment transaction to replace the fragment container with the "MeetingListFragment"
             fragmentManager.beginTransaction()
                     .replace(R.id.fragment_container, new MeetingListFragment())
                     .commit();
         }
 
-        // Ecouteur de clic sur le bouton "add_button"
+        /**
+         * Sets up the click listener for the "Add" button in the UI.
+         * When the button is clicked, it creates an instance of the "AddMeetingFragment,"
+         * obtains the fragment manager, and starts a fragment transaction to replace
+         * the current content with the "AddMeetingFragment." It also adds the transaction to the back stack.
+         */
         binding.addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                // Création d'une instance du fragment "AddMeetingFragment"
+                // Create an instance of the "AddMeetingFragment"
                 Fragment addMeetingFragment = new AddMeetingFragment();
 
-                // Obtention du gestionnaire de fragments
+                // Get the fragment manager to manage the activity's fragments
                 FragmentManager fragmentManager = getSupportFragmentManager();
 
-                // Démarrage d'une transaction de fragment pour remplacer le contenu actuel par "AddMeetingFragment"
+                // Start a fragment transaction to replace the current content with "AddMeetingFragment"
                 fragmentManager.beginTransaction()
                         .replace(R.id.fragment_container, addMeetingFragment)
                         .addToBackStack(null)
@@ -193,17 +231,24 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Configures the Toolbar and visibility of the "Add" button based on the current fragment.
+     *
+     * @param fragment The current fragment being displayed.
+     *                 If it is an instance of AddMeetingFragment, the Toolbar and "Add" button are hidden.
+     *                 If it is the MeetingListFragment, the Toolbar and "Add" button are shown.
+     */
     public void toolbarAndAddButtonAction (Fragment fragment) {
 
         if (fragment instanceof AddMeetingFragment) {
 
-            // L'utilisateur est sur le fragment d'ajout de réunion, la toolbar et le bouton "Add" sont masqués
+            // User is on the "AddMeetingFragment," hide the Toolbar and "Add" button
             getSupportActionBar().hide();
             binding.addButton.setVisibility(View.GONE);
 
         } else {
 
-            // L'utilisateur est sur le fragment de la liste des réunions, la toolbar et le bouton "Add" sont affichés
+            // User is on the "MeetingListFragment," show the Toolbar and "Add" button
             getSupportActionBar().show();
             binding.addButton.setVisibility(View.VISIBLE);
         }
