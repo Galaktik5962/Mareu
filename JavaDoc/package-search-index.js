@@ -1,1 +1,0 @@
-packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"com.example.mareu"},{"l":"com.example.mareu.data"},{"l":"com.example.mareu.DI"},{"l":"com.example.mareu.ui"}];updateSearchResults();
