@@ -116,7 +116,7 @@ You can also use <strong> Git Bash </strong>:
 
 <div style="text-align: center;">
 <img src="pictures_for_readme/added_meeting.jpg" alt="Réunion ajoutée visible dans la liste des réunions">
-<img src="pictures_for_readme/filters_menu.jpg" alt="Menu des filtres">
+<img src="pictures_for_readme/menu_of_filters.jpg" alt="Menu des filtres">
 </div>
 
 <div style="text-align: center; margin-top: 20px;">
