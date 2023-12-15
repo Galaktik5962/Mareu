@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -51,7 +57,6 @@
         app:layout_constraintHorizontal_bias="0.109"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/date_de_la_reunion" />
-
 
     <Button
         android:id="@+id/button_cancel"
@@ -126,8 +131,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button_add_mail">
 
-        <!-- ChipGroup pour les puces d'adresses e-mail -->
-
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/chipGroupParticipants"
             android:layout_width="match_parent"
@@ -159,13 +162,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
 
-
 </androidx.constraintlayout.widget.ConstraintLayout>
 
-<!--regex mail, un seul text view avec un bouton + qui ajoutera les adresses mails sur une seule ligne avec les virgules etc...
-vérifier date et heure valide
-ne pas pouvoir sélectionner une salle si elle est déjà prise à cette heure
-mettre un text view et un bouton calendar à côté de la date pour l'accessibilité et pareil pour la date
- un text view avec sélectionnez votre salle et le spinner en dessous
- gérer mon bouton annuler
- créer un menu sur mon bouton filtre avec des item et subitem voir you tube-->
+</ScrollView>

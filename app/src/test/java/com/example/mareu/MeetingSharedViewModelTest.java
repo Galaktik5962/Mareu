@@ -1,4 +1,4 @@
-/**
+package com.example.mareu; /**
  * JUnit test class for validating the functionality of the MeetingSharedViewModel.
  * Tests include applying filters, updating the list, and resetting filters.
  */

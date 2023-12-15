@@ -1,4 +1,4 @@
-/**
+package com.example.mareu; /**
  * JUnit test class for validating the functionality of the MeetingRepository.
  * Tests include obtaining meetings, deleting meetings, and creating new meetings.
  */

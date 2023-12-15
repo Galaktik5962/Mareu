@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Toolbar -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
@@ -16,10 +15,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:title="@string/app_name"
         app:titleTextColor="@color/white" />
-
-    <!--créer un fichier xml pour créer un menu-->
-
-    <!-- Conteneur du fragment -->
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_container"

@@ -1,4 +1,4 @@
-/**
+package com.example.mareu; /**
  * JUnit test class for validating the functionality of the AddMeetingViewModel.
  * Utilizes the InstantTaskExecutorRule to execute LiveData-related operations synchronously in tests.
  */

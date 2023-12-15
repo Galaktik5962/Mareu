@@ -188,9 +188,5 @@ public class MeetingSharedViewModel extends ViewModel {
     }
 }
 
-// + de dev java que kotlin
-// + de possibilité de resoudre les bug car 25 ans de ressources internet avec java et 6-7 ans kotlin (sur stackoverflow)
-// +
-
 
 
